@@ -27,7 +27,6 @@ import android.view.ViewParent;
 
 import me.lizheng.deckview.helpers.DeckViewConfig;
 import me.lizheng.deckview.helpers.DeckViewSwipeHelper;
-import me.lizheng.deckview.utilities.DVConstants;
 
 /* Handles touch events for a TaskStackView. */
 public class DeckViewTouchHandler implements DeckViewSwipeHelper.Callback {
@@ -50,8 +49,10 @@ public class DeckViewTouchHandler implements DeckViewSwipeHelper.Callback {
 
     int mMinimumVelocity;
     int mMaximumVelocity;
+
     // The scroll touch slop is used to calculate when we start scrolling
     int mScrollTouchSlop;
+
     // The page touch slop is used to calculate when we start swiping
     float mPagingTouchSlop;
 
@@ -293,17 +294,14 @@ public class DeckViewTouchHandler implements DeckViewSwipeHelper.Callback {
                 int velocity = (int) mVelocityTracker.getYVelocity(mActivePointerId);
                 if (mIsScrolling && (Math.abs(velocity) > mMinimumVelocity)) {
                     float overscrollRangePct = Math.abs((float) velocity / mMaximumVelocity);
-                    int overscrollRange = (int) (Math.min(1f, overscrollRangePct) *
-                            (DVConstants.Values.DView.TaskStackMaxOverscrollRange -
-                                    DVConstants.Values.DView.TaskStackMinOverscrollRange));
+                    int overscrollRange = (int) (Math.min(1f, overscrollRangePct) * (128 - 32));
                     mScroller.mScroller.fling(0,
                             mScroller.progressToScrollRange(mScroller.getStackScroll()),
                             0, velocity,
                             0, 0,
                             mScroller.progressToScrollRange(mDeckView.getStackAlgorithm().mMinScrollP),
                             mScroller.progressToScrollRange(mDeckView.getStackAlgorithm().mMaxScrollP),
-                            0, DVConstants.Values.DView.TaskStackMinOverscrollRange +
-                                    overscrollRange);
+                            0, 32 + overscrollRange);
                     // Invalidate to kick off computeScroll
                     mDeckView.invalidate();
                 } else if (mScroller.isScrollOutOfBounds()) {
@@ -416,6 +414,7 @@ public class DeckViewTouchHandler implements DeckViewSwipeHelper.Callback {
         tv.setTouchEnabled(true);
 
         // Remove the task view from the stack
+        //noinspection unchecked
         mDeckView.onDeckChildViewDismissed(tv);
     }
 

@@ -53,17 +53,16 @@ public class ViewAnimation {
     }
 
     /* The animation context for a task view animation out of Recents */
-    public static class TaskViewExitContext {
-        // A trigger to run some logic when all the animations complete.  This works around the fact
-        // that it is difficult to coordinate ViewPropertyAnimators
-        public ReferenceCountedTrigger postAnimationTrigger;
-
-        // The translationY to apply to a TaskView to move it off the bottom of the task stack
-        public int offscreenTranslationY;
-
-        public TaskViewExitContext(ReferenceCountedTrigger t) {
-            postAnimationTrigger = t;
-        }
-    }
-
+//    public static class TaskViewExitContext {
+//        // A trigger to run some logic when all the animations complete.  This works around the fact
+//        // that it is difficult to coordinate ViewPropertyAnimators
+//        public ReferenceCountedTrigger postAnimationTrigger;
+//
+//        // The translationY to apply to a TaskView to move it off the bottom of the task stack
+//        public int offscreenTranslationY;
+//
+//        public TaskViewExitContext(ReferenceCountedTrigger t) {
+//            postAnimationTrigger = t;
+//        }
+//    }
 }

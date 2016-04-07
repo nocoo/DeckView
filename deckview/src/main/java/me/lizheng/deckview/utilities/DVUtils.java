@@ -40,20 +40,6 @@ public class DVUtils {
     }
 
     /**
-     * Calculates a consistent animation duration (ms) for all animations depending on the movement
-     * of the object being animated.
-     */
-//    public static int calculateTranslationAnimationDuration(int distancePx) {
-//        return calculateTranslationAnimationDuration(distancePx, 100);
-//    }
-
-//    public static int calculateTranslationAnimationDuration(int distancePx, int minDuration) {
-//        DeckViewConfig config = DeckViewConfig.getInstance();
-//        return Math.max(minDuration, (int) (1000f /* ms/s */ *
-//                (Math.abs(distancePx) / config.animationPxMovementPerSecond)));
-//    }
-
-    /**
      * Scales a rect about its centroid
      */
     public static void scaleRectAboutCenter(Rect r, float scale) {

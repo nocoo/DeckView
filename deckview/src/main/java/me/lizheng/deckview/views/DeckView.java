@@ -18,6 +18,7 @@
 package me.lizheng.deckview.views;
 
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Matrix;
 import android.graphics.Rect;
@@ -26,22 +27,18 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowInsets;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.FrameLayout;
 
 import me.lizheng.deckview.R;
 import me.lizheng.deckview.helpers.DeckChildViewTransform;
 import me.lizheng.deckview.helpers.DeckViewConfig;
-import me.lizheng.deckview.utilities.DVConstants;
 import me.lizheng.deckview.utilities.DVUtils;
 import me.lizheng.deckview.utilities.DozeTrigger;
-import me.lizheng.deckview.utilities.ReferenceCountedTrigger;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 /* The visual representation of a task stack view */
 public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCallbacks,*/
@@ -54,11 +51,11 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
     DeckViewScroller mStackScroller;
     DeckViewTouchHandler mTouchHandler;
     ViewPool<DeckChildView<T>, T> mViewPool;
-    ArrayList<DeckChildViewTransform> mCurrentTaskTransforms = new ArrayList<DeckChildViewTransform>();
+    ArrayList<DeckChildViewTransform> mCurrentTaskTransforms = new ArrayList<>();
     DozeTrigger mUIDozeTrigger;
     Rect mTaskStackBounds = new Rect();
     int mFocusedTaskIndex = -1;
-    int mPrevAccessibilityFocusedIndex = -1;
+//    int mPrevAccessibilityFocusedIndex = -1;
 
     // Optimizations
     int mStackViewsAnimationDuration;
@@ -73,7 +70,7 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
     Matrix mTmpMatrix = new Matrix();
     Rect mTmpRect = new Rect();
     DeckChildViewTransform mTmpTransform = new DeckChildViewTransform();
-    HashMap<T, DeckChildView> mTmpTaskViewMap = new HashMap<T, DeckChildView>();
+    HashMap<T, DeckChildView> mTmpTaskViewMap = new HashMap<>();
     LayoutInflater mInflater;
 
     // A convenience update listener to request updating clipping of tasks
@@ -103,9 +100,9 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
         mCallback = callback;
         requestLayout();
 
-        mViewPool = new ViewPool<DeckChildView<T>, T>(getContext(), this);
+        mViewPool = new ViewPool<>(getContext(), this);
         mInflater = LayoutInflater.from(getContext());
-        mLayoutAlgorithm = new DeckViewLayoutAlgorithm<T>(mConfig);
+        mLayoutAlgorithm = new DeckViewLayoutAlgorithm<>(mConfig);
         mStackScroller = new DeckViewScroller(getContext(), mConfig, mLayoutAlgorithm);
         mStackScroller.setCallbacks(this);
         mTouchHandler = new DeckViewTouchHandler(getContext(), this, mConfig, mStackScroller);
@@ -126,39 +123,39 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
     /**
      * Resets this TaskStackView for reuse.
      */
-    void reset() {
-        // Reset the focused task
-        resetFocusedTask();
-
-        // Return all the views to the pool
-        int childCount = getChildCount();
-        for (int i = childCount - 1; i >= 0; i--) {
-            DeckChildView<T> tv = (DeckChildView) getChildAt(i);
-            mViewPool.returnViewToPool(tv);
-        }
-
-        // Mark each task view for relayout
-        if (mViewPool != null) {
-            Iterator<DeckChildView<T>> iter = mViewPool.poolViewIterator();
-            if (iter != null) {
-                while (iter.hasNext()) {
-                    DeckChildView tv = iter.next();
-                    tv.reset();
-                }
-            }
-        }
-
-        // Reset the stack state
-        mStackViewsDirty = true;
-        mStackViewsClipDirty = true;
-        mAwaitingFirstLayout = true;
-        mPrevAccessibilityFocusedIndex = -1;
-        if (mUIDozeTrigger != null) {
-            mUIDozeTrigger.stopDozing();
-            mUIDozeTrigger.resetTrigger();
-        }
-        mStackScroller.reset();
-    }
+//    void reset() {
+//        // Reset the focused task
+//        resetFocusedTask();
+//
+//        // Return all the views to the pool
+//        int childCount = getChildCount();
+//        for (int i = childCount - 1; i >= 0; i--) {
+//            @SuppressWarnings("unchecked") DeckChildView<T> tv = (DeckChildView) getChildAt(i);
+//            mViewPool.returnViewToPool(tv);
+//        }
+//
+//        // Mark each task view for relayout
+//        if (mViewPool != null) {
+//            Iterator<DeckChildView<T>> iter = mViewPool.poolViewIterator();
+//            if (iter != null) {
+//                while (iter.hasNext()) {
+//                    DeckChildView tv = iter.next();
+//                    tv.reset();
+//                }
+//            }
+//        }
+//
+//        // Reset the stack state
+//        mStackViewsDirty = true;
+//        mStackViewsClipDirty = true;
+//        mAwaitingFirstLayout = true;
+//        mPrevAccessibilityFocusedIndex = -1;
+//        if (mUIDozeTrigger != null) {
+//            mUIDozeTrigger.stopDozing();
+//            mUIDozeTrigger.resetTrigger();
+//        }
+//        mStackScroller.reset();
+//    }
 
     /**
      * Requests that the views be synchronized with the model
@@ -287,7 +284,7 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
             mTmpTaskViewMap.clear();
             int childCount = getChildCount();
             for (int i = childCount - 1; i >= 0; i--) {
-                DeckChildView<T> tv = (DeckChildView) getChildAt(i);
+                @SuppressWarnings("unchecked") DeckChildView<T> tv = (DeckChildView) getChildAt(i);
                 T key = tv.getAttachedKey();
                 int taskIndex = data.indexOf(key);
 
@@ -339,43 +336,43 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
      */
     void clipTaskViews() {
         // Update the clip on each task child
-        if (DVConstants.DebugFlags.App.EnableTaskStackClipping) {
-            int childCount = getChildCount();
-            for (int i = 0; i < childCount - 1; i++) {
-                DeckChildView tv = (DeckChildView) getChildAt(i);
-                DeckChildView nextTv = null;
-                DeckChildView tmpTv;
-                //int clipBottom = 0;
-                if (tv.shouldClipViewInStack()) {
-                    // Find the next view to clip against
-                    int nextIndex = i;
-                    while (nextIndex < getChildCount()) {
-                        tmpTv = (DeckChildView) getChildAt(++nextIndex);
-                        if (tmpTv != null && tmpTv.shouldClipViewInStack()) {
-                            nextTv = tmpTv;
-                            break;
-                        }
-                    }
 
-                    // Clip against the next view, this is just an approximation since we are
-                    // stacked and we can make assumptions about the visibility of the this
-                    // task relative to the ones in front of it.
-                    if (nextTv != null) {
-                        // Map the top edge of next task view into the local space of the current
-                        // task view to find the clip amount in local space
-                        mTmpCoord[0] = mTmpCoord[1] = 0;
-                        DVUtils.mapCoordInDescendentToSelf(nextTv, this, mTmpCoord, false);
-                        DVUtils.mapCoordInSelfToDescendent(tv, this, mTmpCoord, mTmpMatrix);
-//                        clipBottom = (int) Math.floor(tv.getMeasuredHeight() - mTmpCoord[1]
-//                                - nextTv.getPaddingTop() - 1);
+        int childCount = getChildCount();
+        for (int i = 0; i < childCount - 1; i++) {
+            DeckChildView tv = (DeckChildView) getChildAt(i);
+            DeckChildView nextTv = null;
+            DeckChildView tmpTv;
+            //int clipBottom = 0;
+            if (tv.shouldClipViewInStack()) {
+                // Find the next view to clip against
+                int nextIndex = i;
+                while (nextIndex < getChildCount()) {
+                    tmpTv = (DeckChildView) getChildAt(++nextIndex);
+                    if (tmpTv != null && tmpTv.shouldClipViewInStack()) {
+                        nextTv = tmpTv;
+                        break;
                     }
                 }
+
+                // Clip against the next view, this is just an approximation since we are
+                // stacked and we can make assumptions about the visibility of the this
+                // task relative to the ones in front of it.
+                if (nextTv != null) {
+                    // Map the top edge of next task view into the local space of the current
+                    // task view to find the clip amount in local space
+                    mTmpCoord[0] = mTmpCoord[1] = 0;
+                    DVUtils.mapCoordInDescendentToSelf(nextTv, this, mTmpCoord, false);
+                    DVUtils.mapCoordInSelfToDescendent(tv, this, mTmpCoord, mTmpMatrix);
+//                        clipBottom = (int) Math.floor(tv.getMeasuredHeight() - mTmpCoord[1]
+//                                - nextTv.getPaddingTop() - 1);
+                }
             }
+        }
 
 //            if (getChildCount() > 0) {
 //                // The front most task should never be clipped
 //            }
-        }
+
 
         mStackViewsClipDirty = false;
     }
@@ -517,23 +514,23 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
     /**
      * Resets the focused task.
      */
-    void resetFocusedTask() {
-        if ((0 <= mFocusedTaskIndex) && (mFocusedTaskIndex < mCallback.getData().size())) {
-            DeckChildView tv = getChildViewForTask(mCallback.getData().get(mFocusedTaskIndex));
-            if (tv != null) {
-                tv.unsetFocusedTask();
-            }
-        }
-        mFocusedTaskIndex = -1;
-    }
+//    void resetFocusedTask() {
+//        if ((0 <= mFocusedTaskIndex) && (mFocusedTaskIndex < mCallback.getData().size())) {
+//            DeckChildView tv = getChildViewForTask(mCallback.getData().get(mFocusedTaskIndex));
+//            if (tv != null) {
+//                tv.unsetFocusedTask();
+//            }
+//        }
+//        mFocusedTaskIndex = -1;
+//    }
 
     @Override
     public void onInitializeAccessibilityEvent(AccessibilityEvent event) {
         super.onInitializeAccessibilityEvent(event);
         int childCount = getChildCount();
         if (childCount > 0) {
-            DeckChildView<T> backMostTask = (DeckChildView) getChildAt(0);
-            DeckChildView<T> frontMostTask = (DeckChildView) getChildAt(childCount - 1);
+            @SuppressWarnings("unchecked") DeckChildView<T> backMostTask = (DeckChildView) getChildAt(0);
+            @SuppressWarnings("unchecked") DeckChildView<T> frontMostTask = (DeckChildView) getChildAt(childCount - 1);
             event.setFromIndex(mCallback.getData().indexOf(backMostTask.getAttachedKey()));
             event.setToIndex(mCallback.getData().indexOf(frontMostTask.getAttachedKey()));
         }
@@ -585,7 +582,7 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
         if (getChildCount() == 0)
             return -1;
 
-        DeckChildView<T> frontMostChild = (DeckChildView) getChildAt(getChildCount() / 2);
+        @SuppressWarnings("unchecked") DeckChildView<T> frontMostChild = (DeckChildView) getChildAt(getChildCount() / 2);
 
         if (frontMostChild != null) {
             return mCallback.getData().indexOf(frontMostChild.getAttachedKey());
@@ -624,6 +621,7 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
      * This is called with the full window width and height to allow stack view children to
      * perform the full screen transition down.
      */
+    @SuppressLint("DrawAllocation")
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int width = MeasureSpec.getSize(widthMeasureSpec);
@@ -766,7 +764,7 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
 
             // Animate all the task views into view
             for (int i = childCount - 1; i >= 0; i--) {
-                DeckChildView<T> tv = (DeckChildView) getChildAt(i);
+                @SuppressWarnings("unchecked") DeckChildView<T> tv = (DeckChildView) getChildAt(i);
                 T key = tv.getAttachedKey();
                 ctx.currentTaskTransform = new DeckChildViewTransform();
                 ctx.currentStackViewIndex = i;
@@ -880,6 +878,7 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
      * * ViewPoolConsumer Implementation ***
      */
 
+    @SuppressWarnings("unchecked")
     @Override
     public DeckChildView createView(Context context) {
         return (DeckChildView) mInflater.inflate(R.layout.deck_child_view, this, false);
@@ -913,7 +912,7 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
         dcv.onTaskBound(key);
 
         // Load the task data
-        mCallback.loadViewData(new WeakReference<DeckChildView<T>>(dcv), key);
+        mCallback.loadViewData(new WeakReference<>(dcv), key);
 
         // If the doze trigger has already fired, then update the state for this task view
         if (mUIDozeTrigger.hasTriggered()) {
@@ -931,7 +930,7 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
         if (position != -1) {
             int childCount = getChildCount();
             for (int i = 0; i < childCount; i++) {
-                T otherKey = ((DeckChildView<T>) getChildAt(i)).getAttachedKey();
+                @SuppressWarnings("unchecked") T otherKey = ((DeckChildView<T>) getChildAt(i)).getAttachedKey();
                 int pos = mCallback.getData().indexOf(otherKey);
                 if (position < pos) {
                     insertIndex = i;
@@ -965,10 +964,6 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
     /**
      * * DeckChildCallbacks Implementation ***
      */
-
-    @Override
-    public void onDeckChildViewAppIconClicked(DeckChildView tv) {
-    }
 
     @Override
     public void onDeckChildViewAppInfoClicked(DeckChildView tv) {
@@ -1087,7 +1082,7 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
                 : null;
         // Update the new front most task
         if (newFrontMostTask != null) {
-            DeckChildView<T> frontTv = getChildViewForTask(newFrontMostTask);
+            @SuppressWarnings("unchecked") DeckChildView<T> frontTv = getChildViewForTask(newFrontMostTask);
             if (frontTv != null) {
                 frontTv.onTaskBound(newFrontMostTask);
             }

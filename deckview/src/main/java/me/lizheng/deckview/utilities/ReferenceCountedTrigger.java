@@ -33,21 +33,6 @@ public class ReferenceCountedTrigger {
     ArrayList<Runnable> mLastDecRunnables = new ArrayList<>();
     Runnable mErrorRunnable;
 
-    // Convenience runnables
-//    Runnable mIncrementRunnable = new Runnable() {
-//        @Override
-//        public void run() {
-//            increment();
-//        }
-//    };
-
-    Runnable mDecrementRunnable = new Runnable() {
-        @Override
-        public void run() {
-            decrement();
-        }
-    };
-
     public ReferenceCountedTrigger(Context context, Runnable firstIncRunnable,
                                    Runnable lastDecRunnable, Runnable errorRunanable) {
         mContext = context;
@@ -68,13 +53,6 @@ public class ReferenceCountedTrigger {
         }
         mCount++;
     }
-
-    /**
-     * Convenience method to increment this trigger as a runnable
-     */
-//    public Runnable incrementAsRunnable() {
-//        return mIncrementRunnable;
-//    }
 
     /**
      * Adds a runnable to the last-decrement runnables list.
@@ -103,34 +81,7 @@ public class ReferenceCountedTrigger {
                 mErrorRunnable.run();
             } else {
                 new Throwable("Invalid ref count").printStackTrace();
-                //Console.logError(mContext, "Invalid ref count");
             }
         }
     }
-
-    /**
-     * Convenience method to decrement this trigger as a runnable.
-     */
-    public Runnable decrementAsRunnable() {
-        return mDecrementRunnable;
-    }
-
-    /**
-     * Convenience method to decrement this trigger as a animator listener.
-     */
-//    public Animator.AnimatorListener decrementOnAnimationEnd() {
-//        return new AnimatorListenerAdapter() {
-//            @Override
-//            public void onAnimationEnd(Animator animation) {
-//                decrement();
-//            }
-//        };
-//    }
-
-    /**
-     * Returns the current ref count
-     */
-//    public int getCount() {
-//        return mCount;
-//    }
 }

@@ -29,7 +29,6 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 
 import me.lizheng.deckview.R;
-import me.lizheng.deckview.utilities.DVConstants;
 
 /**
  * Configuration helper
@@ -188,12 +187,11 @@ public class DeckViewConfig {
      * Updates the state, given the specified context
      */
     void update(Context context) {
-        SharedPreferences settings = context.getSharedPreferences(context.getPackageName(), 0);
         Resources res = context.getResources();
         DisplayMetrics dm = res.getDisplayMetrics();
 
         // Debug mode
-        debugModeEnabled = settings.getBoolean(DVConstants.Values.App.Key_DebugModeEnabled, false);
+        debugModeEnabled = false;
 
         // Layout
         isLandscape = res.getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
@@ -293,12 +291,6 @@ public class DeckViewConfig {
      */
     public void updateSystemInsets(Rect insets) {
         systemInsets.set(insets);
-    }
-
-    /**
-     * Updates the search bar app widget
-     */
-    public void updateSearchBarAppWidgetId(Context context, int appWidgetId) {
     }
 
     /**

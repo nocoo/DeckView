@@ -20,6 +20,7 @@ package me.lizheng.deckview.views;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
@@ -107,6 +108,7 @@ public class DeckChildViewThumbnail extends View {
         }
     }
 
+    @SuppressLint("DrawAllocation")
     @Override
     protected void onDraw(Canvas canvas) {
         if (mInvisible) {
@@ -179,22 +181,7 @@ public class DeckChildViewThumbnail extends View {
         int top = (int) Math.max(0, taskBar.getTranslationY() +
                 taskBar.getMeasuredHeight() - 1);
         mClipRect.set(0, top, getMeasuredWidth(), getMeasuredHeight());
-//        setClipBounds(mClipRect);
     }
-
-    /**
-     * Updates the visibility of the the thumbnail.
-     */
-//    void updateThumbnailVisibility(int clipBottom) {
-//        boolean invisible = mTaskBar != null && (getHeight() - clipBottom) <= mTaskBar.getHeight();
-//        if (invisible != mInvisible) {
-//            mInvisible = invisible;
-//            if (!mInvisible) {
-//                updateThumbnailPaintFilter();
-//            }
-//            invalidate();
-//        }
-//    }
 
     /**
      * Sets the dim alpha, only used when we are not using hardware layers.
@@ -226,10 +213,6 @@ public class DeckChildViewThumbnail extends View {
 
     Bitmap mThumbnail;
 
-    public Bitmap getThumbnail() {
-        return mThumbnail;
-    }
-
     /**
      * Handles focus changes.
      */
@@ -256,21 +239,6 @@ public class DeckChildViewThumbnail extends View {
             mThumbnailAlpha = mConfig.taskViewThumbnailAlpha;
         }
         updateThumbnailPaintFilter();
-    }
-
-    /**
-     * Animates this task thumbnail as it enters Recents.
-     */
-//    void startEnterRecentsAnimation(int delay, Runnable postAnimRunnable) {
-//        startFadeAnimation(mConfig.taskViewThumbnailAlpha, delay,
-//                mConfig.taskViewEnterFromAppDuration, postAnimRunnable);
-//    }
-
-    /**
-     * Animates this task thumbnail as it exits Recents.
-     */
-    void startLaunchTaskAnimation(Runnable postAnimRunnable) {
-        startFadeAnimation(1f, 0, mConfig.taskViewExitToAppDuration, postAnimRunnable);
     }
 
     /**

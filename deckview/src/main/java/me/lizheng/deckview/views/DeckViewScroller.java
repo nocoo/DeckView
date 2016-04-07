@@ -54,9 +54,9 @@ public class DeckViewScroller {
     /**
      * Resets the task scroller.
      */
-    public void reset() {
-        mStackScrollP = 0f;
-    }
+//    public void reset() {
+//        mStackScrollP = 0f;
+//    }
 
     /**
      * Sets the callbacks

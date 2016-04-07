@@ -23,6 +23,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -64,10 +65,11 @@ public class DeckViewSampleActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_deck_view_sample);
 
+        //noinspection unchecked
         mDeckView = (DeckView) findViewById(R.id.deckview);
         mDefaultThumbnail = BitmapFactory.decodeResource(getResources(),
                 R.drawable.default_thumbnail);
-        mDefaultHeaderIcon = getResources().getDrawable(R.drawable.default_header_icon);
+        mDefaultHeaderIcon = ContextCompat.getDrawable(getApplicationContext(), R.drawable.default_header_icon);
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(CURRENT_LIST)) {

@@ -35,12 +35,6 @@ import android.view.animation.LinearInterpolator;
  * events and translates / fades / animates the view as it is dismissed.
  */
 public class DeckViewSwipeHelper {
-    static final String TAG = "DeckViewSwipeHelper";
-    private static final boolean SLOW_ANIMATIONS = false; // DEBUG;
-    private static final boolean CONSTRAIN_SWIPE = true;
-    private static final boolean FADE_OUT_DURING_SWIPE = true;
-    private static final boolean DISMISS_IF_SWIPED_FAR_ENOUGH = true;
-
     public static final int X = 0;
     public static final int Y = 1;
 
@@ -49,11 +43,13 @@ public class DeckViewSwipeHelper {
     private static final float SWIPE_ESCAPE_VELOCITY = 100f; // dp/sec
     private static final int DEFAULT_ESCAPE_ANIMATION_DURATION = 75; // ms
     private static final int MAX_ESCAPE_ANIMATION_DURATION = 150; // ms
-    private static final int SNAP_ANIM_LEN = SLOW_ANIMATIONS ? 1000 : 250; // ms
+    private static final int SNAP_ANIM_LEN = 250; // ms
 
     public static float ALPHA_FADE_START = 0.15f; // fraction of thumbnail width
+
     // where fade starts
     static final float ALPHA_FADE_END = 0.65f; // fraction of thumbnail width
+
     // beyond which alpha->0
     private float mMinAlpha = 0f;
 
@@ -120,9 +116,8 @@ public class DeckViewSwipeHelper {
     }
 
     private ObjectAnimator createTranslationAnimation(View v, float newPos) {
-        ObjectAnimator anim = ObjectAnimator.ofFloat(v,
+        return  ObjectAnimator.ofFloat(v,
                 mSwipeDirection == X ? View.TRANSLATION_X : View.TRANSLATION_Y, newPos);
-        return anim;
     }
 
     private float getPerpendicularVelocity(VelocityTracker vt) {
@@ -167,11 +162,8 @@ public class DeckViewSwipeHelper {
      */
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     public static boolean isLayoutRtl(View view) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            return View.LAYOUT_DIRECTION_RTL == view.getLayoutDirection();
-        } else {
-            return false;
-        }
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1
+                && View.LAYOUT_DIRECTION_RTL == view.getLayoutDirection();
     }
 
     public boolean onInterceptTouchEvent(MotionEvent ev) {
@@ -243,7 +235,7 @@ public class DeckViewSwipeHelper {
             @Override
             public void onAnimationEnd(Animator animation) {
                 mCallback.onChildDismissed(view);
-                if (FADE_OUT_DURING_SWIPE && canAnimViewBeDismissed) {
+                if (canAnimViewBeDismissed) {
                     view.setAlpha(1.f);
                 }
             }
@@ -251,7 +243,7 @@ public class DeckViewSwipeHelper {
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                if (FADE_OUT_DURING_SWIPE && canAnimViewBeDismissed) {
+                if (canAnimViewBeDismissed) {
                     view.setAlpha(getAlphaForOffset(view));
                 }
             }
@@ -268,7 +260,7 @@ public class DeckViewSwipeHelper {
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                if (FADE_OUT_DURING_SWIPE && canAnimViewBeDismissed) {
+                if (canAnimViewBeDismissed) {
                     view.setAlpha(getAlphaForOffset(view));
                 }
                 mCallback.onSwipeChanged(mCurrView, view.getTranslationX());
@@ -277,7 +269,7 @@ public class DeckViewSwipeHelper {
         anim.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                if (FADE_OUT_DURING_SWIPE && canAnimViewBeDismissed) {
+                if (canAnimViewBeDismissed) {
                     view.setAlpha(1.0f);
                 }
                 mCallback.onSnapBackCompleted(view);
@@ -317,8 +309,7 @@ public class DeckViewSwipeHelper {
     private void setSwipeAmount(float amount) {
         // don't let items that can't be dismissed be dragged more than
         // maxScrollDistance
-        if (CONSTRAIN_SWIPE
-                && (!isValidSwipeDirection(amount) || !mCallback.canChildBeDismissed(mCurrView))) {
+        if (!isValidSwipeDirection(amount) || !mCallback.canChildBeDismissed(mCurrView)) {
             float size = getSize(mCurrView);
             float maxScrollDistance = 0.15f * size;
             if (Math.abs(amount) >= size) {
@@ -328,7 +319,7 @@ public class DeckViewSwipeHelper {
             }
         }
         setTranslation(mCurrView, amount);
-        if (FADE_OUT_DURING_SWIPE && mCanCurrViewBeDimissed) {
+        if (mCanCurrViewBeDimissed) {
             float alpha = getAlphaForOffset(mCurrView);
             mCurrView.setAlpha(alpha);
         }
@@ -354,8 +345,7 @@ public class DeckViewSwipeHelper {
         float escapeVelocity = SWIPE_ESCAPE_VELOCITY * mDensityScale;
         float translation = getTranslation(mCurrView);
         // Decide whether to dismiss the current view
-        boolean childSwipedFarEnough = DISMISS_IF_SWIPED_FAR_ENOUGH &&
-                Math.abs(translation) > 0.6 * getSize(mCurrView);
+        boolean childSwipedFarEnough = Math.abs(translation) > 0.6 * getSize(mCurrView);
         boolean childSwipedFastEnough = (Math.abs(velocity) > escapeVelocity) &&
                 (Math.abs(velocity) > Math.abs(perpendicularVelocity)) &&
                 (velocity > 0) == (translation > 0);
@@ -376,17 +366,11 @@ public class DeckViewSwipeHelper {
 
     public interface Callback {
         View getChildAtPosition(MotionEvent ev);
-
         boolean canChildBeDismissed(View v);
-
         void onBeginDrag(View v);
-
         void onSwipeChanged(View v, float delta);
-
         void onChildDismissed(View v);
-
         void onSnapBackCompleted(View v);
-
         void onDragCancelled(View v);
     }
 }

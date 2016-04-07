@@ -85,10 +85,10 @@ public class ViewPool<V, T> {
     /**
      * Returns an iterator to the list of the views in the pool.
      */
-    Iterator<V> poolViewIterator() {
-        if (mPool != null) {
-            return mPool.iterator();
-        }
-        return null;
-    }
+//    Iterator<V> poolViewIterator() {
+//        if (mPool != null) {
+//            return mPool.iterator();
+//        }
+//        return null;
+//    }
 }

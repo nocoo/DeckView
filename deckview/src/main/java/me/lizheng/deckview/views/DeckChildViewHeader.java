@@ -17,39 +17,31 @@
 
 package me.lizheng.deckview.views;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.RippleDrawable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewOutlineProvider;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import me.lizheng.deckview.R;
 import me.lizheng.deckview.helpers.DeckViewConfig;
-import me.lizheng.deckview.utilities.DVConstants;
 import me.lizheng.deckview.utilities.DVUtils;
 
 /* The task bar view */
@@ -74,10 +66,6 @@ public class DeckChildViewHeader extends FrameLayout {
 
     // Static highlight that we draw at the top of each view
     static Paint sHighlightPaint;
-
-    // Header dim, which is only used when task view hardware layers are not used
-    Paint mDimLayerPaint = new Paint();
-    PorterDuffColorFilter mDimColorFilter = new PorterDuffColorFilter(0, PorterDuff.Mode.SRC_ATOP);
 
     public DeckChildViewHeader(Context context) {
         this(context, null);
@@ -113,6 +101,7 @@ public class DeckChildViewHeader extends FrameLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+
         // Initialize the icon and description views
         mApplicationIcon = (ImageView) findViewById(R.id.application_icon);
         mActivityDescription = (TextView) findViewById(R.id.activity_description);
@@ -130,6 +119,7 @@ public class DeckChildViewHeader extends FrameLayout {
         setBackgroundDrawable(mBackgroundColorDrawable);
     }
 
+    @SuppressLint("DrawAllocation")
     @Override
     protected void onDraw(Canvas canvas) {
         // Draw the highlight at the top edge (but put the bottom edge just out of view)
@@ -148,17 +138,6 @@ public class DeckChildViewHeader extends FrameLayout {
     }
 
     /**
-     * Sets the dim alpha, only used when we are not using hardware layers.
-     * (see RecentsConfiguration.useHardwareLayers)
-     */
-    void setDimAlpha(int alpha) {
-        mDimColorFilter = new PorterDuffColorFilter(Color.argb(alpha, 0, 0, 0),
-                PorterDuff.Mode.SRC_ATOP);
-        mDimLayerPaint.setColorFilter(mDimColorFilter);
-        setLayerType(LAYER_TYPE_HARDWARE, mDimLayerPaint);
-    }
-
-    /**
      * Returns the secondary color for a primary color.
      */
     int getSecondaryColor(int primaryColor, boolean useLightOverlayColor) {
@@ -169,7 +148,6 @@ public class DeckChildViewHeader extends FrameLayout {
     /**
      * Binds the bar view to the task
      */
-    //public void rebindToTask(Task t) {
     public void rebindToTask(Drawable headerIcon, String headerTitle, int headerBgColor) {
         // If an activity icon is defined, then we use that as the primary icon to show in the bar,
         // otherwise, we fall back to the application icon
@@ -201,22 +179,6 @@ public class DeckChildViewHeader extends FrameLayout {
     }
 
     /**
-     * Animates this task bar dismiss button when launching a task.
-     */
-    void startLaunchTaskDismissAnimation() {
-        if (mDismissButton.getVisibility() == View.VISIBLE) {
-            mDismissButton.animate().cancel();
-            mDismissButton.animate()
-                    .alpha(0f)
-                    .setStartDelay(0)
-                    .setInterpolator(mConfig.fastOutSlowInInterpolator)
-                    .setDuration(mConfig.taskViewExitToAppDuration)
-//                    .withLayer()
-                    .start();
-        }
-    }
-
-    /**
      * Animates this task bar if the user does not interact with the stack after a certain time.
      */
     void startNoUserInteractionAnimation() {
@@ -228,7 +190,6 @@ public class DeckChildViewHeader extends FrameLayout {
                     .setStartDelay(0)
                     .setInterpolator(mConfig.fastOutLinearInInterpolator)
                     .setDuration(mConfig.taskViewEnterFromAppDuration)
-//                    .withLayer()
                     .start();
         }
     }
@@ -273,31 +234,12 @@ public class DeckChildViewHeader extends FrameLayout {
         }
 
         if (focused) {
-//            int secondaryColor = getSecondaryColor(mCurrentPrimaryColor, mCurrentPrimaryColorIsDark);
-//            int[][] states = new int[][]{
-//                    new int[]{android.R.attr.state_enabled},
-//                    new int[]{android.R.attr.state_pressed}
-//            };
-//            int[] newStates = new int[]{
-//                    android.R.attr.state_enabled,
-//                    android.R.attr.state_pressed
-//            };
-//            int[] colors = new int[]{
-//                    secondaryColor,
-//                    secondaryColor
-//            };
-
             // Pulse the background color
             int currentColor = mBackgroundColor;
             int lightPrimaryColor = getSecondaryColor(mCurrentPrimaryColor, mCurrentPrimaryColorIsDark);
             ValueAnimator backgroundColor = ValueAnimator.ofObject(new ArgbEvaluator(),
                     currentColor, lightPrimaryColor);
-//            backgroundColor.addListener(new AnimatorListenerAdapter() {
-//                @Override
-//                public void onAnimationStart(Animator animation) {
-//                    mBackground.setState(new int[]{});
-//                }
-//            });
+
             backgroundColor.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {

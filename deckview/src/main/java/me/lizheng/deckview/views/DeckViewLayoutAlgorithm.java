@@ -38,18 +38,18 @@ public class DeckViewLayoutAlgorithm<T> {
     static final float StackPeekMinScale = 0.8f; // The min scale of the last card in the peek area
 
     // A report of the visibility state of the stack
-    public class VisibilityReport {
-        public int numVisibleTasks;
-        public int numVisibleThumbnails;
-
-        /**
-         * Package level ctor
-         */
-        VisibilityReport(int tasks, int thumbnails) {
-            numVisibleTasks = tasks;
-            numVisibleThumbnails = thumbnails;
-        }
-    }
+//    public class VisibilityReport {
+//        public int numVisibleTasks;
+//        public int numVisibleThumbnails;
+//
+//        /**
+//         * Package level ctor
+//         */
+//        VisibilityReport(int tasks, int thumbnails) {
+//            numVisibleTasks = tasks;
+//            numVisibleThumbnails = thumbnails;
+//        }
+//    }
 
     DeckViewConfig mConfig;
 
@@ -125,13 +125,13 @@ public class DeckViewLayoutAlgorithm<T> {
         // Note that we should account for the scale difference of the offsets at the screen bottom
         int taskHeight = mTaskRect.height();
         float pAtBottomOfStackRect = screenYToCurveProgress(mStackVisibleRect.bottom);
-        float pWithinAffiliateTop = screenYToCurveProgress(mStackVisibleRect.bottom -
-                mWithinAffiliationOffset);
-        float scale = curveProgressToScale(pWithinAffiliateTop);
-        int scaleYOffset = (int) (((1f - scale) * taskHeight) / 2);
-        pWithinAffiliateTop = screenYToCurveProgress(mStackVisibleRect.bottom -
-                mWithinAffiliationOffset + scaleYOffset);
-        //float pWithinAffiliateOffset = pAtBottomOfStackRect - pWithinAffiliateTop;
+//        float pWithinAffiliateTop = screenYToCurveProgress(mStackVisibleRect.bottom -
+//                mWithinAffiliationOffset);
+//        float scale = curveProgressToScale(pWithinAffiliateTop);
+//        int scaleYOffset = (int) (((1f - scale) * taskHeight) / 2);
+//        pWithinAffiliateTop = screenYToCurveProgress(mStackVisibleRect.bottom -
+//                mWithinAffiliationOffset + scaleYOffset);
+//        float pWithinAffiliateOffset = pAtBottomOfStackRect - pWithinAffiliateTop;
         float pBetweenAffiliateOffset = pAtBottomOfStackRect -
                 screenYToCurveProgress(mStackVisibleRect.bottom - mBetweenAffiliationOffset);
         float pTaskHeightOffset = pAtBottomOfStackRect -
@@ -174,53 +174,53 @@ public class DeckViewLayoutAlgorithm<T> {
      * Computes the maximum number of visible tasks and thumbnails.  Requires that
      * computeMinMaxScroll() is called first.
      */
-    public VisibilityReport computeStackVisibilityReport(ArrayList<T> data) {
-        if (data.size() <= 1) {
-            return new VisibilityReport(1, 1);
-        }
-
-        // Walk backwards in the task stack and count the number of tasks and visible thumbnails
-        int taskHeight = mTaskRect.height();
-        int numVisibleTasks = 1;
-        int numVisibleThumbnails = 1;
-        //float progress = mTaskProgressMap.get(tasks.get(tasks.size() - 1).key) - mInitialScrollP;
-
-        float progress = mTaskProgressMap.get(data.get(data.size() - 1)) - mInitialScrollP;
-        int prevScreenY = curveProgressToScreenY(progress);
-        for (int i = data.size() - 2; i >= 0; i--) {
-            //Task task = tasks.get(i);
-            //progress = mTaskProgressMap.get(task.key) - mInitialScrollP;
-            progress = mTaskProgressMap.get(data.get(i)) - mInitialScrollP;
-            if (progress < 0) {
-                break;
-            }
-
-            // TODO: Might need adjustments
-            float scaleAtP = curveProgressToScale(progress);
-            int scaleYOffsetAtP = (int) (((1f - scaleAtP) * taskHeight) / 2);
-            int screenY = curveProgressToScreenY(progress) + scaleYOffsetAtP;
-            boolean hasVisibleThumbnail = (prevScreenY - screenY) > mConfig.taskBarHeight;
-            if (hasVisibleThumbnail) {
-                numVisibleThumbnails++;
-                numVisibleTasks++;
-                prevScreenY = screenY;
-            } else {
-                // Once we hit the next front most task that does not have a visible thumbnail,
-                // walk through remaining visible set
-                for (int j = i; j >= 0; j--) {
-                    numVisibleTasks++;
-                    progress = mTaskProgressMap.get(data.get(i)) - mInitialScrollP;
-                    if (progress < 0) {
-                        break;
-                    }
-                }
-
-                break;
-            }
-        }
-
-        return new VisibilityReport(numVisibleTasks, numVisibleThumbnails);
-    }
+//    public VisibilityReport computeStackVisibilityReport(ArrayList<T> data) {
+//        if (data.size() <= 1) {
+//            return new VisibilityReport(1, 1);
+//        }
+//
+//        // Walk backwards in the task stack and count the number of tasks and visible thumbnails
+//        int taskHeight = mTaskRect.height();
+//        int numVisibleTasks = 1;
+//        int numVisibleThumbnails = 1;
+//        //float progress = mTaskProgressMap.get(tasks.get(tasks.size() - 1).key) - mInitialScrollP;
+//
+//        float progress = mTaskProgressMap.get(data.get(data.size() - 1)) - mInitialScrollP;
+//        int prevScreenY = curveProgressToScreenY(progress);
+//        for (int i = data.size() - 2; i >= 0; i--) {
+//            //Task task = tasks.get(i);
+//            //progress = mTaskProgressMap.get(task.key) - mInitialScrollP;
+//            progress = mTaskProgressMap.get(data.get(i)) - mInitialScrollP;
+//            if (progress < 0) {
+//                break;
+//            }
+//
+//            // TODO: Might need adjustments
+//            float scaleAtP = curveProgressToScale(progress);
+//            int scaleYOffsetAtP = (int) (((1f - scaleAtP) * taskHeight) / 2);
+//            int screenY = curveProgressToScreenY(progress) + scaleYOffsetAtP;
+//            boolean hasVisibleThumbnail = (prevScreenY - screenY) > mConfig.taskBarHeight;
+//            if (hasVisibleThumbnail) {
+//                numVisibleThumbnails++;
+//                numVisibleTasks++;
+//                prevScreenY = screenY;
+//            } else {
+//                // Once we hit the next front most task that does not have a visible thumbnail,
+//                // walk through remaining visible set
+//                for (int j = i; j >= 0; j--) {
+//                    numVisibleTasks++;
+//                    progress = mTaskProgressMap.get(data.get(i)) - mInitialScrollP;
+//                    if (progress < 0) {
+//                        break;
+//                    }
+//                }
+//
+//                break;
+//            }
+//        }
+//
+//        return new VisibilityReport(numVisibleTasks, numVisibleThumbnails);
+//    }
 
     /**
      * Update/get the transform
@@ -415,7 +415,12 @@ public class DeckViewLayoutAlgorithm<T> {
      */
     float screenYToCurveProgress(int screenY) {
         float x = (float) (screenY - mStackVisibleRect.top) / mStackVisibleRect.height();
-        if (x < 0 || x > 1) return x;
+
+        if (x < 0 || x > 1) {
+            //noinspection SuspiciousNameCombination
+            return x;
+        }
+
         float xIndex = x * PrecisionSteps;
         int xFloorIndex = (int) Math.floor(xIndex);
         int xCeilIndex = (int) Math.ceil(xIndex);

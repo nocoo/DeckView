@@ -17,7 +17,6 @@
 
 package me.lizheng.deckview.helpers;
 
-import android.animation.ValueAnimator;
 import android.graphics.Rect;
 import android.support.v4.view.ViewCompat;
 import android.view.View;
@@ -39,16 +38,16 @@ public class DeckChildViewTransform {
         // Do nothing
     }
 
-    public DeckChildViewTransform(DeckChildViewTransform o) {
-        startDelay = o.startDelay;
-        translationY = o.translationY;
-        translationZ = o.translationZ;
-        scale = o.scale;
-        alpha = o.alpha;
-        visible = o.visible;
-        rect.set(o.rect);
-        p = o.p;
-    }
+//    public DeckChildViewTransform(DeckChildViewTransform o) {
+//        startDelay = o.startDelay;
+//        translationY = o.translationY;
+//        translationZ = o.translationZ;
+//        scale = o.scale;
+//        alpha = o.alpha;
+//        visible = o.visible;
+//        rect.set(o.rect);
+//        p = o.p;
+//    }
 
     /**
      * Resets the current transform
@@ -86,12 +85,12 @@ public class DeckChildViewTransform {
     /**
      * Applies this transform to a view.
      */
-    public void applyToTaskView(View v, int duration, Interpolator interp, boolean allowLayers,
-                                boolean allowShadows, ValueAnimator.AnimatorUpdateListener updateCallback) {
+    public void applyToTaskView(View v, int duration, Interpolator interp, /*boolean allowLayers,*/
+                                boolean allowShadows/*, ValueAnimator.AnimatorUpdateListener updateCallback*/) {
         // Check to see if any properties have changed, and update the task view
         if (duration > 0) {
             ViewPropertyAnimator anim = v.animate();
-            boolean requiresLayers = false;
+//            boolean requiresLayers = false;
 
             // Animate to the final state
             if (hasTranslationYChangedFrom(v.getTranslationY())) {
@@ -103,12 +102,12 @@ public class DeckChildViewTransform {
             if (hasScaleChangedFrom(v.getScaleX())) {
                 anim.scaleX(scale)
                         .scaleY(scale);
-                requiresLayers = true;
+//                requiresLayers = true;
             }
             if (hasAlphaChangedFrom(v.getAlpha())) {
                 // Use layers if we animate alpha
                 anim.alpha(alpha);
-                requiresLayers = true;
+//                requiresLayers = true;
             }
 //            if (requiresLayers && allowLayers) {
 //                anim.withLayer();
