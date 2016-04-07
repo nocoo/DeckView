@@ -54,7 +54,7 @@
         android:layout_marginRight="4dp"
         android:layout_gravity="center_vertical|end"
         android:padding="12dp"
-        android:background="@drawable/w45"
         android:visibility="invisible"
-        android:src="@drawable/deck_child_view_dismiss_light" />
+        android:src="@drawable/deck_child_view_dismiss_light"/>
+
 </me.lizheng.deckview.views.DeckChildViewHeader>
