@@ -24,24 +24,17 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.View;
 
-import me.lizheng.deckview.helpers.DeckViewConfig;
-
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 public class DVUtils {
-    // Reflection methods for altering shadows
-    private static Method sPropertyMethod;
-
     static {
         try {
+            // Reflection methods for altering shadows
             Class<?> c = Class.forName("android.view.GLES20Canvas");
-            sPropertyMethod = c.getDeclaredMethod("setProperty", String.class, String.class);
+            Method sPropertyMethod = c.getDeclaredMethod("setProperty", String.class, String.class);
             if (!sPropertyMethod.isAccessible()) sPropertyMethod.setAccessible(true);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -50,15 +43,15 @@ public class DVUtils {
      * Calculates a consistent animation duration (ms) for all animations depending on the movement
      * of the object being animated.
      */
-    public static int calculateTranslationAnimationDuration(int distancePx) {
-        return calculateTranslationAnimationDuration(distancePx, 100);
-    }
+//    public static int calculateTranslationAnimationDuration(int distancePx) {
+//        return calculateTranslationAnimationDuration(distancePx, 100);
+//    }
 
-    public static int calculateTranslationAnimationDuration(int distancePx, int minDuration) {
-        DeckViewConfig config = DeckViewConfig.getInstance();
-        return Math.max(minDuration, (int) (1000f /* ms/s */ *
-                (Math.abs(distancePx) / config.animationPxMovementPerSecond)));
-    }
+//    public static int calculateTranslationAnimationDuration(int distancePx, int minDuration) {
+//        DeckViewConfig config = DeckViewConfig.getInstance();
+//        return Math.max(minDuration, (int) (1000f /* ms/s */ *
+//                (Math.abs(distancePx) / config.animationPxMovementPerSecond)));
+//    }
 
     /**
      * Scales a rect about its centroid
@@ -77,11 +70,11 @@ public class DVUtils {
     }
 
     /**
-     * Maps a coorindate in a descendant view into the parent.
+     * Maps a coordinate in a descendant view into the parent.
      */
     public static float mapCoordInDescendentToSelf(View descendant, View root,
                                                    float[] coord, boolean includeRootScroll) {
-        ArrayList<View> ancestorChain = new ArrayList<View>();
+        ArrayList<View> ancestorChain = new ArrayList<>();
 
         float[] pt = {coord[0], coord[1]};
 
@@ -119,7 +112,7 @@ public class DVUtils {
      */
     public static float mapCoordInSelfToDescendent(View descendant, View root,
                                                    float[] coord, Matrix tmpInverseMatrix) {
-        ArrayList<View> ancestorChain = new ArrayList<View>();
+        ArrayList<View> ancestorChain = new ArrayList<>();
 
         float[] pt = {coord[0], coord[1]};
 
@@ -157,25 +150,25 @@ public class DVUtils {
     /**
      * Calculates the constrast between two colors, using the algorithm provided by the WCAG v2.
      */
-    public static float computeContrastBetweenColors(int bg, int fg) {
-        float bgR = Color.red(bg) / 255f;
-        float bgG = Color.green(bg) / 255f;
-        float bgB = Color.blue(bg) / 255f;
-        bgR = (bgR < 0.03928f) ? bgR / 12.92f : (float) Math.pow((bgR + 0.055f) / 1.055f, 2.4f);
-        bgG = (bgG < 0.03928f) ? bgG / 12.92f : (float) Math.pow((bgG + 0.055f) / 1.055f, 2.4f);
-        bgB = (bgB < 0.03928f) ? bgB / 12.92f : (float) Math.pow((bgB + 0.055f) / 1.055f, 2.4f);
-        float bgL = 0.2126f * bgR + 0.7152f * bgG + 0.0722f * bgB;
-
-        float fgR = Color.red(fg) / 255f;
-        float fgG = Color.green(fg) / 255f;
-        float fgB = Color.blue(fg) / 255f;
-        fgR = (fgR < 0.03928f) ? fgR / 12.92f : (float) Math.pow((fgR + 0.055f) / 1.055f, 2.4f);
-        fgG = (fgG < 0.03928f) ? fgG / 12.92f : (float) Math.pow((fgG + 0.055f) / 1.055f, 2.4f);
-        fgB = (fgB < 0.03928f) ? fgB / 12.92f : (float) Math.pow((fgB + 0.055f) / 1.055f, 2.4f);
-        float fgL = 0.2126f * fgR + 0.7152f * fgG + 0.0722f * fgB;
-
-        return Math.abs((fgL + 0.05f) / (bgL + 0.05f));
-    }
+//    public static float computeContrastBetweenColors(int bg, int fg) {
+//        float bgR = Color.red(bg) / 255f;
+//        float bgG = Color.green(bg) / 255f;
+//        float bgB = Color.blue(bg) / 255f;
+//        bgR = (bgR < 0.03928f) ? bgR / 12.92f : (float) Math.pow((bgR + 0.055f) / 1.055f, 2.4f);
+//        bgG = (bgG < 0.03928f) ? bgG / 12.92f : (float) Math.pow((bgG + 0.055f) / 1.055f, 2.4f);
+//        bgB = (bgB < 0.03928f) ? bgB / 12.92f : (float) Math.pow((bgB + 0.055f) / 1.055f, 2.4f);
+//        float bgL = 0.2126f * bgR + 0.7152f * bgG + 0.0722f * bgB;
+//
+//        float fgR = Color.red(fg) / 255f;
+//        float fgG = Color.green(fg) / 255f;
+//        float fgB = Color.blue(fg) / 255f;
+//        fgR = (fgR < 0.03928f) ? fgR / 12.92f : (float) Math.pow((fgR + 0.055f) / 1.055f, 2.4f);
+//        fgG = (fgG < 0.03928f) ? fgG / 12.92f : (float) Math.pow((fgG + 0.055f) / 1.055f, 2.4f);
+//        fgB = (fgB < 0.03928f) ? fgB / 12.92f : (float) Math.pow((fgB + 0.055f) / 1.055f, 2.4f);
+//        float fgL = 0.2126f * fgR + 0.7152f * fgG + 0.0722f * fgB;
+//
+//        return Math.abs((fgL + 0.05f) / (bgL + 0.05f));
+//    }
 
     /**
      * Returns the base color overlaid with another overlay color with a specified alpha.
@@ -193,10 +186,10 @@ public class DVUtils {
     /**
      * Sets some private shadow properties.
      */
-    public static void setShadowProperty(String property, String value)
-            throws IllegalAccessException, InvocationTargetException {
-        sPropertyMethod.invoke(null, property, value);
-    }
+//    public static void setShadowProperty(String property, String value)
+//            throws IllegalAccessException, InvocationTargetException {
+//        sPropertyMethod.invoke(null, property, value);
+//    }
 
     /**
      * Cancels an animation ensuring that if it has listeners, onCancel and onEnd

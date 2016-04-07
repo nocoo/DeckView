@@ -17,8 +17,6 @@
 
 package me.lizheng.deckview.utilities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 
 import java.util.ArrayList;
@@ -31,17 +29,18 @@ public class ReferenceCountedTrigger {
 
     Context mContext;
     int mCount;
-    ArrayList<Runnable> mFirstIncRunnables = new ArrayList<Runnable>();
-    ArrayList<Runnable> mLastDecRunnables = new ArrayList<Runnable>();
+    ArrayList<Runnable> mFirstIncRunnables = new ArrayList<>();
+    ArrayList<Runnable> mLastDecRunnables = new ArrayList<>();
     Runnable mErrorRunnable;
 
     // Convenience runnables
-    Runnable mIncrementRunnable = new Runnable() {
-        @Override
-        public void run() {
-            increment();
-        }
-    };
+//    Runnable mIncrementRunnable = new Runnable() {
+//        @Override
+//        public void run() {
+//            increment();
+//        }
+//    };
+
     Runnable mDecrementRunnable = new Runnable() {
         @Override
         public void run() {
@@ -73,9 +72,9 @@ public class ReferenceCountedTrigger {
     /**
      * Convenience method to increment this trigger as a runnable
      */
-    public Runnable incrementAsRunnable() {
-        return mIncrementRunnable;
-    }
+//    public Runnable incrementAsRunnable() {
+//        return mIncrementRunnable;
+//    }
 
     /**
      * Adds a runnable to the last-decrement runnables list.
@@ -119,19 +118,19 @@ public class ReferenceCountedTrigger {
     /**
      * Convenience method to decrement this trigger as a animator listener.
      */
-    public Animator.AnimatorListener decrementOnAnimationEnd() {
-        return new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                decrement();
-            }
-        };
-    }
+//    public Animator.AnimatorListener decrementOnAnimationEnd() {
+//        return new AnimatorListenerAdapter() {
+//            @Override
+//            public void onAnimationEnd(Animator animation) {
+//                decrement();
+//            }
+//        };
+//    }
 
     /**
      * Returns the current ref count
      */
-    public int getCount() {
-        return mCount;
-    }
+//    public int getCount() {
+//        return mCount;
+//    }
 }

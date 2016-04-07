@@ -115,7 +115,7 @@ public class DeckChildView<T> extends FrameLayout implements
         setTaskProgress(getTaskProgress());
         setDim(getDim());
         if (mConfig.fakeShadows) {
-            setBackgroundDrawable(new FakeShadowDrawable(context.getResources(), mConfig));
+            setBackgroundDrawable(new FakeShadowDrawable(context, mConfig));
         }
     }
 

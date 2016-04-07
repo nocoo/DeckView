@@ -112,6 +112,7 @@ public class DeckChildViewThumbnail extends View {
         if (mInvisible) {
             return;
         }
+
         // Draw the thumbnail with the rounded corners
         canvas.drawRoundRect(new RectF(0, 0, getWidth(), getHeight()),
                 mConfig.taskViewRoundedCornerRadiusPx,
@@ -184,16 +185,16 @@ public class DeckChildViewThumbnail extends View {
     /**
      * Updates the visibility of the the thumbnail.
      */
-    void updateThumbnailVisibility(int clipBottom) {
-        boolean invisible = mTaskBar != null && (getHeight() - clipBottom) <= mTaskBar.getHeight();
-        if (invisible != mInvisible) {
-            mInvisible = invisible;
-            if (!mInvisible) {
-                updateThumbnailPaintFilter();
-            }
-            invalidate();
-        }
-    }
+//    void updateThumbnailVisibility(int clipBottom) {
+//        boolean invisible = mTaskBar != null && (getHeight() - clipBottom) <= mTaskBar.getHeight();
+//        if (invisible != mInvisible) {
+//            mInvisible = invisible;
+//            if (!mInvisible) {
+//                updateThumbnailPaintFilter();
+//            }
+//            invalidate();
+//        }
+//    }
 
     /**
      * Sets the dim alpha, only used when we are not using hardware layers.
@@ -260,10 +261,10 @@ public class DeckChildViewThumbnail extends View {
     /**
      * Animates this task thumbnail as it enters Recents.
      */
-    void startEnterRecentsAnimation(int delay, Runnable postAnimRunnable) {
-        startFadeAnimation(mConfig.taskViewThumbnailAlpha, delay,
-                mConfig.taskViewEnterFromAppDuration, postAnimRunnable);
-    }
+//    void startEnterRecentsAnimation(int delay, Runnable postAnimRunnable) {
+//        startFadeAnimation(mConfig.taskViewThumbnailAlpha, delay,
+//                mConfig.taskViewEnterFromAppDuration, postAnimRunnable);
+//    }
 
     /**
      * Animates this task thumbnail as it exits Recents.

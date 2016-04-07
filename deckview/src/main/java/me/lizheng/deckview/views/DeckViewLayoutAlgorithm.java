@@ -65,7 +65,7 @@ public class DeckViewLayoutAlgorithm<T> {
     float mInitialScrollP;
     int mWithinAffiliationOffset;
     int mBetweenAffiliationOffset;
-    HashMap<T, Float> mTaskProgressMap = new HashMap<T, Float>();
+    HashMap<T, Float> mTaskProgressMap = new HashMap<>();
 
     // Log function
     static final float XScale = 1.75f;  // The large the XScale, the longer the flat area of the curve
@@ -131,7 +131,7 @@ public class DeckViewLayoutAlgorithm<T> {
         int scaleYOffset = (int) (((1f - scale) * taskHeight) / 2);
         pWithinAffiliateTop = screenYToCurveProgress(mStackVisibleRect.bottom -
                 mWithinAffiliationOffset + scaleYOffset);
-        float pWithinAffiliateOffset = pAtBottomOfStackRect - pWithinAffiliateTop;
+        //float pWithinAffiliateOffset = pAtBottomOfStackRect - pWithinAffiliateTop;
         float pBetweenAffiliateOffset = pAtBottomOfStackRect -
                 screenYToCurveProgress(mStackVisibleRect.bottom - mBetweenAffiliationOffset);
         float pTaskHeightOffset = pAtBottomOfStackRect -
@@ -141,8 +141,7 @@ public class DeckViewLayoutAlgorithm<T> {
                         mStackRect.bottom));
 
         // Update the task offsets
-        float pAtBackMostCardTop = 0.5f;
-        float pAtFrontMostCardTop = pAtBackMostCardTop;
+        float pAtFrontMostCardTop = 0.5f;
         int taskCount = data.size();
         for (int i = 0; i < taskCount; i++) {
             //Task task = tasks.get(i);
@@ -154,19 +153,20 @@ public class DeckViewLayoutAlgorithm<T> {
                 // TODO: Might need adjustments
                 //float pPeek = task.group.isFrontMostTask(task) ?
                 //pBetweenAffiliateOffset : pWithinAffiliateOffset;
-                float pPeek = pBetweenAffiliateOffset;
-                pAtFrontMostCardTop += pPeek;
+                pAtFrontMostCardTop += pBetweenAffiliateOffset;
             }
         }
 
         mMaxScrollP = pAtFrontMostCardTop - ((1f - pTaskHeightOffset - pNavBarOffset));
         mMinScrollP = data.size() == 1 ? Math.max(mMaxScrollP, 0f) : 0f;
+
         if (launchedWithAltTab && launchedFromHome) {
             // Center the top most task, since that will be focused first
             mInitialScrollP = mMaxScrollP;
         } else {
             mInitialScrollP = pAtFrontMostCardTop - 0.825f;
         }
+
         mInitialScrollP = Math.min(mMaxScrollP, Math.max(0, mInitialScrollP));
     }
 
@@ -196,34 +196,29 @@ public class DeckViewLayoutAlgorithm<T> {
             }
 
             // TODO: Might need adjustments
-            //boolean isFrontMostTaskInGroup = task.group.isFrontMostTask(task);
-            boolean isFrontMostTaskInGroup = true;
-            if (isFrontMostTaskInGroup) {
-                float scaleAtP = curveProgressToScale(progress);
-                int scaleYOffsetAtP = (int) (((1f - scaleAtP) * taskHeight) / 2);
-                int screenY = curveProgressToScreenY(progress) + scaleYOffsetAtP;
-                boolean hasVisibleThumbnail = (prevScreenY - screenY) > mConfig.taskBarHeight;
-                if (hasVisibleThumbnail) {
-                    numVisibleThumbnails++;
-                    numVisibleTasks++;
-                    prevScreenY = screenY;
-                } else {
-                    // Once we hit the next front most task that does not have a visible thumbnail,
-                    // walk through remaining visible set
-                    for (int j = i; j >= 0; j--) {
-                        numVisibleTasks++;
-                        progress = mTaskProgressMap.get(data.get(i)) - mInitialScrollP;
-                        if (progress < 0) {
-                            break;
-                        }
-                    }
-                    break;
-                }
-            } else if (!isFrontMostTaskInGroup) {
-                // Affiliated task, no thumbnail
+            float scaleAtP = curveProgressToScale(progress);
+            int scaleYOffsetAtP = (int) (((1f - scaleAtP) * taskHeight) / 2);
+            int screenY = curveProgressToScreenY(progress) + scaleYOffsetAtP;
+            boolean hasVisibleThumbnail = (prevScreenY - screenY) > mConfig.taskBarHeight;
+            if (hasVisibleThumbnail) {
+                numVisibleThumbnails++;
                 numVisibleTasks++;
+                prevScreenY = screenY;
+            } else {
+                // Once we hit the next front most task that does not have a visible thumbnail,
+                // walk through remaining visible set
+                for (int j = i; j >= 0; j--) {
+                    numVisibleTasks++;
+                    progress = mTaskProgressMap.get(data.get(i)) - mInitialScrollP;
+                    if (progress < 0) {
+                        break;
+                    }
+                }
+
+                break;
             }
         }
+
         return new VisibilityReport(numVisibleTasks, numVisibleThumbnails);
     }
 
@@ -250,12 +245,14 @@ public class DeckViewLayoutAlgorithm<T> {
                                                     DeckChildViewTransform prevTransform) {
         float pTaskRelative = taskProgress - stackScroll;
         float pBounded = Math.max(0, Math.min(pTaskRelative, 1f));
+
         // If the task top is outside of the bounds below the screen, then immediately reset it
         if (pTaskRelative > 1f) {
             transformOut.reset();
             transformOut.rect.set(mTaskRect);
             return transformOut;
         }
+
         // The check for the top is trickier, since we want to show the next task if it is at all
         // visible, even if p < 0.
         if (pTaskRelative < 0f) {
@@ -265,6 +262,7 @@ public class DeckViewLayoutAlgorithm<T> {
                 return transformOut;
             }
         }
+
         float scale = curveProgressToScale(pBounded);
         int scaleYOffset = (int) (((1f - scale) * mTaskRect.height()) / 2);
         int minZ = mConfig.taskViewTranslationZMinPx;
@@ -278,17 +276,18 @@ public class DeckViewLayoutAlgorithm<T> {
         DVUtils.scaleRectAboutCenter(transformOut.rect, transformOut.scale);
         transformOut.visible = true;
         transformOut.p = pTaskRelative;
+
         return transformOut;
     }
 
     /**
      * Returns the untransformed task view size.
      */
-    public Rect getUntransformedTaskViewSize() {
-        Rect tvSize = new Rect(mTaskRect);
-        tvSize.offsetTo(0, 0);
-        return tvSize;
-    }
+//    public Rect getUntransformedTaskViewSize() {
+//        Rect tvSize = new Rect(mTaskRect);
+//        tvSize.offsetTo(0, 0);
+//        return tvSize;
+//    }
 
     /**
      * Returns the scroll to such task top = 1f;
@@ -303,6 +302,7 @@ public class DeckViewLayoutAlgorithm<T> {
      */
     public static void initializeCurve() {
         if (xp != null && px != null) return;
+
         xp = new float[PrecisionSteps + 1];
         px = new float[PrecisionSteps + 1];
 
@@ -314,6 +314,7 @@ public class DeckViewLayoutAlgorithm<T> {
             fx[xStep] = logFunc(x);
             x += step;
         }
+
         // Calculate the arc length for x:1->0
         float pLength = 0;
         float[] dx = new float[PrecisionSteps + 1];
@@ -322,6 +323,7 @@ public class DeckViewLayoutAlgorithm<T> {
             dx[xStep] = (float) Math.sqrt(Math.pow(fx[xStep] - fx[xStep - 1], 2) + Math.pow(step, 2));
             pLength += dx[xStep];
         }
+
         // Approximate p(x), a function of cumulative progress with x, normalized to 0..1
         float p = 0;
         px[0] = 0f;
@@ -330,18 +332,21 @@ public class DeckViewLayoutAlgorithm<T> {
             p += Math.abs(dx[xStep] / pLength);
             px[xStep] = p;
         }
+
         // Given p(x), calculate the inverse function x(p). This assumes that x(p) is also a valid
         // function.
         int xStep = 0;
         p = 0;
         xp[0] = 0f;
         xp[PrecisionSteps] = 1f;
+
         for (int pStep = 0; pStep < PrecisionSteps; pStep++) {
             // Walk forward in px and find the x where px <= p && p < px+1
             while (xStep < PrecisionSteps) {
                 if (px[xStep] > p) break;
                 xStep++;
             }
+
             // Now, px[xStep-1] <= p < px[xStep]
             if (xStep == 0) {
                 xp[pStep] = 0;
@@ -351,6 +356,7 @@ public class DeckViewLayoutAlgorithm<T> {
                 x = (xStep - 1 + fraction) * step;
                 xp[pStep] = x;
             }
+
             p += step;
         }
     }
@@ -372,9 +378,9 @@ public class DeckViewLayoutAlgorithm<T> {
     /**
      * The inverse of the log function describing the curve.
      */
-    float invLogFunc(float y) {
-        return (float) (Math.log((1f - reverse(y)) * (LogBase - 1) + 1) / Math.log(LogBase));
-    }
+//    float invLogFunc(float y) {
+//        return (float) (Math.log((1f - reverse(y)) * (LogBase - 1) + 1) / Math.log(LogBase));
+//    }
 
     /**
      * Converts from the progress along the curve to a screen coordinate.
@@ -400,8 +406,8 @@ public class DeckViewLayoutAlgorithm<T> {
         if (p < 0) return StackPeekMinScale;
         if (p > 1) return 1f;
         float scaleRange = (1f - StackPeekMinScale);
-        float scale = StackPeekMinScale + (p * scaleRange);
-        return scale;
+
+        return StackPeekMinScale + (p * scaleRange);
     }
 
     /**
@@ -414,10 +420,12 @@ public class DeckViewLayoutAlgorithm<T> {
         int xFloorIndex = (int) Math.floor(xIndex);
         int xCeilIndex = (int) Math.ceil(xIndex);
         float pFraction = 0;
+
         if (xFloorIndex < PrecisionSteps && (xCeilIndex != xFloorIndex)) {
             float xFraction = (xIndex - xFloorIndex) / (xCeilIndex - xFloorIndex);
             pFraction = (px[xCeilIndex] - px[xFloorIndex]) * xFraction;
         }
+
         return px[xFloorIndex] + pFraction;
     }
 }

@@ -85,9 +85,9 @@ public class DozeTrigger {
     /**
      * Returns whether we are dozing or not.
      */
-    public boolean isDozing() {
-        return mIsDozing;
-    }
+//    public boolean isDozing() {
+//        return mIsDozing;
+//    }
 
     /**
      * Returns whether the trigger has fired at least once.

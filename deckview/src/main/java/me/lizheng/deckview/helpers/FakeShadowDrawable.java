@@ -17,7 +17,7 @@
 
 package me.lizheng.deckview.helpers;
 
-import android.content.res.Resources;
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.LinearGradient;
@@ -29,6 +29,8 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import me.lizheng.deckview.R;
@@ -75,19 +77,17 @@ public class FakeShadowDrawable extends Drawable {
 
     private final int mShadowEndColor;
 
-    private boolean mAddPaddingForCorners = true;
-
     /**
      * If shadow size is set to a value above max shadow, we print a warning
      */
     private boolean mPrintedShadowClipWarning = false;
 
-    public FakeShadowDrawable(Resources resources, DeckViewConfig config) {
-        mShadowStartColor = resources.getColor(R.color.fake_shadow_start_color);
-        mShadowEndColor = resources.getColor(R.color.fake_shadow_end_color);
-        mInsetShadow = resources.getDimension(R.dimen.fake_shadow_inset);
-        setShadowSize(resources.getDimensionPixelSize(R.dimen.fake_shadow_size),
-                resources.getDimensionPixelSize(R.dimen.fake_shadow_size));
+    public FakeShadowDrawable(Context context, DeckViewConfig config) {
+        mShadowStartColor = ContextCompat.getColor(context, R.color.fake_shadow_start_color);
+        mShadowEndColor = ContextCompat.getColor(context, R.color.fake_shadow_end_color);
+        mInsetShadow = context.getResources().getDimension(R.dimen.fake_shadow_inset);
+        setShadowSize(context.getResources().getDimensionPixelSize(R.dimen.fake_shadow_size),
+                context.getResources().getDimensionPixelSize(R.dimen.fake_shadow_size));
         mCornerShadowPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
         mCornerShadowPaint.setStyle(Paint.Style.FILL);
         mCornerShadowPaint.setDither(true);
@@ -132,11 +132,9 @@ public class FakeShadowDrawable extends Drawable {
     }
 
     @Override
-    public boolean getPadding(Rect padding) {
-        int vOffset = (int) Math.ceil(calculateVerticalPadding(mRawMaxShadowSize, mCornerRadius,
-                mAddPaddingForCorners));
-        int hOffset = (int) Math.ceil(calculateHorizontalPadding(mRawMaxShadowSize, mCornerRadius,
-                mAddPaddingForCorners));
+    public boolean getPadding(@NonNull Rect padding) {
+        int vOffset = (int) Math.ceil(calculateVerticalPadding(mRawMaxShadowSize, mCornerRadius, true));
+        int hOffset = (int) Math.ceil(calculateHorizontalPadding(mRawMaxShadowSize, mCornerRadius, true));
         padding.set(hOffset, vOffset, hOffset, vOffset);
         return true;
     }
@@ -273,15 +271,15 @@ public class FakeShadowDrawable extends Drawable {
         buildShadowCorners();
     }
 
-    float getMinWidth() {
-        final float content = 2 *
-                Math.max(mRawMaxShadowSize, mCornerRadius + mInsetShadow + mRawMaxShadowSize / 2);
-        return content + (mRawMaxShadowSize + mInsetShadow) * 2;
-    }
-
-    float getMinHeight() {
-        final float content = 2 * Math.max(mRawMaxShadowSize, mCornerRadius + mInsetShadow
-                + mRawMaxShadowSize * SHADOW_MULTIPLIER / 2);
-        return content + (mRawMaxShadowSize * SHADOW_MULTIPLIER + mInsetShadow) * 2;
-    }
+//    float getMinWidth() {
+//        final float content = 2 *
+//                Math.max(mRawMaxShadowSize, mCornerRadius + mInsetShadow + mRawMaxShadowSize / 2);
+//        return content + (mRawMaxShadowSize + mInsetShadow) * 2;
+//    }
+//
+//    float getMinHeight() {
+//        final float content = 2 * Math.max(mRawMaxShadowSize, mCornerRadius + mInsetShadow
+//                + mRawMaxShadowSize * SHADOW_MULTIPLIER / 2);
+//        return content + (mRawMaxShadowSize * SHADOW_MULTIPLIER + mInsetShadow) * 2;
+//    }
 }

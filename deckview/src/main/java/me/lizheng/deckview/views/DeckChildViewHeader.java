@@ -38,6 +38,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RippleDrawable;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -93,8 +94,8 @@ public class DeckChildViewHeader extends FrameLayout {
 
         // Load the dismiss resources
         Resources res = context.getResources();
-        mLightDismissDrawable = res.getDrawable(R.drawable.deck_child_view_dismiss_light);
-        mDarkDismissDrawable = res.getDrawable(R.drawable.deck_child_view_dismiss_dark);
+        mLightDismissDrawable = ContextCompat.getDrawable(context, R.drawable.deck_child_view_dismiss_light);
+        mDarkDismissDrawable = ContextCompat.getDrawable(context, R.drawable.deck_child_view_dismiss_dark);
         mDismissContentDescription =
                 res.getString(R.string.accessibility_item_will_be_dismissed);
 
@@ -107,14 +108,6 @@ public class DeckChildViewHeader extends FrameLayout {
             sHighlightPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.ADD));
             sHighlightPaint.setAntiAlias(true);
         }
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        // We ignore taps on the task bar except on the filter and dismiss buttons
-        if (!DVConstants.DebugFlags.App.EnableTaskBarTouchEvents) return true;
-
-        return super.onTouchEvent(event);
     }
 
     @Override
@@ -132,7 +125,7 @@ public class DeckChildViewHeader extends FrameLayout {
 //            }
 //        }
 
-        mBackgroundColorDrawable = (GradientDrawable) getContext().getResources().getDrawable(R.drawable
+        mBackgroundColorDrawable = (GradientDrawable) ContextCompat.getDrawable(getContext(), R.drawable
                 .deck_child_view_header_bg_color);
         setBackgroundDrawable(mBackgroundColorDrawable);
     }
@@ -280,30 +273,31 @@ public class DeckChildViewHeader extends FrameLayout {
         }
 
         if (focused) {
-            int secondaryColor = getSecondaryColor(mCurrentPrimaryColor, mCurrentPrimaryColorIsDark);
-            int[][] states = new int[][]{
-                    new int[]{android.R.attr.state_enabled},
-                    new int[]{android.R.attr.state_pressed}
-            };
-            int[] newStates = new int[]{
-                    android.R.attr.state_enabled,
-                    android.R.attr.state_pressed
-            };
-            int[] colors = new int[]{
-                    secondaryColor,
-                    secondaryColor
-            };
+//            int secondaryColor = getSecondaryColor(mCurrentPrimaryColor, mCurrentPrimaryColorIsDark);
+//            int[][] states = new int[][]{
+//                    new int[]{android.R.attr.state_enabled},
+//                    new int[]{android.R.attr.state_pressed}
+//            };
+//            int[] newStates = new int[]{
+//                    android.R.attr.state_enabled,
+//                    android.R.attr.state_pressed
+//            };
+//            int[] colors = new int[]{
+//                    secondaryColor,
+//                    secondaryColor
+//            };
+
             // Pulse the background color
             int currentColor = mBackgroundColor;
             int lightPrimaryColor = getSecondaryColor(mCurrentPrimaryColor, mCurrentPrimaryColorIsDark);
             ValueAnimator backgroundColor = ValueAnimator.ofObject(new ArgbEvaluator(),
                     currentColor, lightPrimaryColor);
-            backgroundColor.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationStart(Animator animation) {
+//            backgroundColor.addListener(new AnimatorListenerAdapter() {
+//                @Override
+//                public void onAnimationStart(Animator animation) {
 //                    mBackground.setState(new int[]{});
-                }
-            });
+//                }
+//            });
             backgroundColor.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
@@ -312,8 +306,10 @@ public class DeckChildViewHeader extends FrameLayout {
                     mBackgroundColor = color;
                 }
             });
+
             backgroundColor.setRepeatCount(ValueAnimator.INFINITE);
             backgroundColor.setRepeatMode(ValueAnimator.REVERSE);
+
             // Pulse the translation
             ObjectAnimator translation = ObjectAnimator.ofFloat(this, "translationZ", 15f);
             translation.setRepeatCount(ValueAnimator.INFINITE);
@@ -324,31 +320,27 @@ public class DeckChildViewHeader extends FrameLayout {
             mFocusAnimator.setStartDelay(750);
             mFocusAnimator.setDuration(750);
             mFocusAnimator.start();
-        } else {
-            if (isRunning) {
-                // Restore the background color
-                int currentColor = mBackgroundColor;
-                ValueAnimator backgroundColor = ValueAnimator.ofObject(new ArgbEvaluator(),
-                        currentColor, mCurrentPrimaryColor);
-                backgroundColor.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        int color = (int) animation.getAnimatedValue();
-                        mBackgroundColorDrawable.setColor(color);
-                        mBackgroundColor = color;
-                    }
-                });
-                // Restore the translation
-                ObjectAnimator translation = ObjectAnimator.ofFloat(this, "translationZ", 0f);
+        } else if (isRunning) {
+            // Restore the background color
+            int currentColor = mBackgroundColor;
+            ValueAnimator backgroundColor = ValueAnimator.ofObject(new ArgbEvaluator(),
+                    currentColor, mCurrentPrimaryColor);
+            backgroundColor.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    int color = (int) animation.getAnimatedValue();
+                    mBackgroundColorDrawable.setColor(color);
+                    mBackgroundColor = color;
+                }
+            });
 
-                mFocusAnimator = new AnimatorSet();
-                mFocusAnimator.playTogether(backgroundColor, translation);
-                mFocusAnimator.setDuration(150);
-                mFocusAnimator.start();
-            } else {
-//                mBackground.setState(new int[]{});
-//                setTranslationZ(0f);
-            }
+            // Restore the translation
+            ObjectAnimator translation = ObjectAnimator.ofFloat(this, "translationZ", 0f);
+
+            mFocusAnimator = new AnimatorSet();
+            mFocusAnimator.playTogether(backgroundColor, translation);
+            mFocusAnimator.setDuration(150);
+            mFocusAnimator.start();
         }
     }
 }

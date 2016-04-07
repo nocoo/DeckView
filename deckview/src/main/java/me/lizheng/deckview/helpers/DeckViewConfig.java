@@ -22,6 +22,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Rect;
+import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.animation.AnimationUtils;
@@ -36,20 +37,6 @@ import me.lizheng.deckview.utilities.DVConstants;
 public class DeckViewConfig {
     static DeckViewConfig sInstance;
     static int sPrevConfigurationHashCode;
-
-    /**
-     * Levels of svelte in increasing severity/austerity.
-     */
-    // No svelting.
-    public static final int SVELTE_NONE = 0;
-    // Limit thumbnail cache to number of visible thumbnails when Recents was loaded, disable
-    // caching thumbnails as you scroll.
-    public static final int SVELTE_LIMIT_CACHE = 1;
-    // Disable the thumbnail cache, load thumbnails asynchronously when the activity loads and
-    // evict all thumbnails when hidden.
-    public static final int SVELTE_DISABLE_CACHE = 2;
-    // Disable all thumbnail loading.
-    public static final int SVELTE_DISABLE_LOADING = 3;
 
     /**
      * Animations
@@ -137,15 +124,10 @@ public class DeckViewConfig {
      * Launch states
      */
     public boolean launchedWithAltTab;
-    public boolean launchedWithNoRecentTasks;
     public boolean launchedFromAppWithThumbnail;
     public boolean launchedFromHome;
-    public boolean launchedFromSearchHome;
     public boolean launchedReuseTaskStackViews;
     public boolean launchedHasConfigurationChanged;
-    public int launchedToTaskId;
-    public int launchedNumVisibleTasks;
-    public int launchedNumVisibleThumbnails;
 
     /**
      * Misc *
@@ -275,13 +257,17 @@ public class DeckViewConfig {
 
         // Task bar colors
         taskBarViewDefaultBackgroundColor =
-                res.getColor(R.color.task_bar_default_background_color);
+                ContextCompat.getColor(context, R.color.task_bar_default_background_color);
+
         taskBarViewLightTextColor =
-                res.getColor(R.color.task_bar_light_text_color);
+                ContextCompat.getColor(context, R.color.task_bar_light_text_color);
+
         taskBarViewDarkTextColor =
-                res.getColor(R.color.task_bar_dark_text_color);
+                ContextCompat.getColor(context, R.color.task_bar_dark_text_color);
+
         taskBarViewHighlightColor =
-                res.getColor(R.color.task_bar_highlight_color);
+                ContextCompat.getColor(context, R.color.task_bar_highlight_color);
+
         TypedValue affMinAlphaPctValue = new TypedValue();
         res.getValue(R.dimen.task_affiliation_color_min_alpha_percentage, affMinAlphaPctValue, true);
         taskBarViewAffiliationColorMinAlpha = affMinAlphaPctValue.getFloat();
@@ -313,14 +299,12 @@ public class DeckViewConfig {
      * Updates the search bar app widget
      */
     public void updateSearchBarAppWidgetId(Context context, int appWidgetId) {
-
     }
 
     /**
      * Updates the states that need to be re-read whenever we re-initialize.
      */
     void updateOnReinitialize(Context context/*, SystemServicesProxy ssp*/) {
-
     }
 
     /**

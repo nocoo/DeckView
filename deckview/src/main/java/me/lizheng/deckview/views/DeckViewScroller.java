@@ -30,7 +30,7 @@ import me.lizheng.deckview.utilities.DVUtils;
 /* The scrolling logic for a TaskStackView */
 public class DeckViewScroller {
     public interface DeckViewScrollerCallbacks {
-        public void onScrollChanged(float p);
+        void onScrollChanged(float p);
     }
 
     DeckViewConfig mConfig;
@@ -110,21 +110,23 @@ public class DeckViewScroller {
             setStackScroll(newScroll);
             return true;
         }
+
         return false;
     }
 
     /**
      * Bounds the current scroll if necessary, but does not synchronize the stack view with the model.
      */
-    public boolean boundScrollRaw() {
-        float curScroll = getStackScroll();
-        float newScroll = getBoundedStackScroll(curScroll);
-        if (Float.compare(newScroll, curScroll) != 0) {
-            setStackScrollRaw(newScroll);
-            return true;
-        }
-        return false;
-    }
+//    public boolean boundScrollRaw() {
+//        float curScroll = getStackScroll();
+//        float newScroll = getBoundedStackScroll(curScroll);
+//        if (Float.compare(newScroll, curScroll) != 0) {
+//            setStackScrollRaw(newScroll);
+//            return true;
+//        }
+//
+//        return false;
+//    }
 
     /**
      * Returns the bounded stack scroll

@@ -408,10 +408,13 @@ public class DeckViewTouchHandler implements DeckViewSwipeHelper.Callback {
     @Override
     public void onChildDismissed(View v) {
         DeckChildView tv = (DeckChildView) v;
+
         // Re-enable clipping with the stack (we will reuse this view)
         tv.setClipViewInStack(true);
+
         // Re-enable touch events from this task view
         tv.setTouchEnabled(true);
+
         // Remove the task view from the stack
         mDeckView.onDeckChildViewDismissed(tv);
     }

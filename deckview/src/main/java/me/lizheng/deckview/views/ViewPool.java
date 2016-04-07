@@ -27,18 +27,15 @@ public class ViewPool<V, T> {
 
     /* An interface to the consumer of a view pool */
     public interface ViewPoolConsumer<V, T> {
-        public V createView(Context context);
-
-        public void prepareViewToEnterPool(V v);
-
-        public void prepareViewToLeavePool(V v, T prepareData, boolean isNewView);
-
-        public boolean hasPreferredData(V v, T preferredData);
+        V createView(Context context);
+        void prepareViewToEnterPool(V v);
+        void prepareViewToLeavePool(V v, T prepareData, boolean isNewView);
+        boolean hasPreferredData(V v, T preferredData);
     }
 
     Context mContext;
     ViewPoolConsumer<V, T> mViewCreator;
-    LinkedList<V> mPool = new LinkedList<V>();
+    LinkedList<V> mPool = new LinkedList<>();
 
     /**
      * Initializes the pool with a fixed predetermined pool size
