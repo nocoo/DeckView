@@ -21,6 +21,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -93,11 +94,7 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
     }
 
     public DeckView(Context context, AttributeSet attrs, int defStyleAttr) {
-        this(context, attrs, defStyleAttr, 0);
-    }
-
-    public DeckView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
+        super(context, attrs, defStyleAttr);
         DeckViewConfig.reinitialize(getContext());
         mConfig = DeckViewConfig.getInstance();
     }
@@ -373,12 +370,9 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
                                 - nextTv.getPaddingTop() - 1);
                     }
                 }
-                tv.getViewBounds().setClipBottom(clipBottom);
             }
             if (getChildCount() > 0) {
                 // The front most task should never be clipped
-                DeckChildView tv = (DeckChildView) getChildAt(getChildCount() - 1);
-                tv.getViewBounds().setClipBottom(0);
             }
         }
         mStackViewsClipDirty = false;
@@ -545,7 +539,7 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
         }
         event.setItemCount(mCallback.getData().size());
         event.setScrollY(mStackScroller.mScroller.getCurrY());
-        event.setMaxScrollY(mStackScroller.progressToScrollRange(mLayoutAlgorithm.mMaxScrollP));
+//        event.setMaxScrollY(mStackScroller.progressToScrollRange(mLayoutAlgorithm.mMaxScrollP));
     }
 
     @Override
@@ -796,17 +790,17 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
         }
     }
 
-    @Override
-    public WindowInsets onApplyWindowInsets(WindowInsets insets) {
-        // Update the configuration with the latest system insets and trigger a relayout
-        // mConfig.updateSystemInsets(insets.getSystemWindowInsets());
-        mConfig.updateSystemInsets(new Rect(insets.getSystemWindowInsetLeft(),
-                insets.getSystemWindowInsetTop(),
-                insets.getSystemWindowInsetRight(),
-                insets.getSystemWindowInsetBottom()));
-        requestLayout();
-        return insets.consumeSystemWindowInsets();
-    }
+//    @Override
+//    public WindowInsets onApplyWindowInsets(WindowInsets insets) {
+//        // Update the configuration with the latest system insets and trigger a relayout
+//        // mConfig.updateSystemInsets(insets.getSystemWindowInsets());
+//        mConfig.updateSystemInsets(new Rect(insets.getSystemWindowInsetLeft(),
+//                insets.getSystemWindowInsetTop(),
+//                insets.getSystemWindowInsetRight(),
+//                insets.getSystemWindowInsetBottom()));
+//        requestLayout();
+//        return insets.consumeSystemWindowInsets();
+//    }
 
     void hideDeck(Context context, Runnable finishRunnable) {
         ReferenceCountedTrigger exitTrigger = new ReferenceCountedTrigger(context,
@@ -1086,7 +1080,7 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
         }
 
         // Animate all the tasks into place
-        requestSynchronizeStackViewsWithModel(200);
+        requestSynchronizeStackViewsWithModel(100);
 
         T newFrontMostTask = mCallback.getData().size() > 0 ?
                 mCallback.getData().get(mCallback.getData().size() - 1)
@@ -1127,7 +1121,7 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
     public void onScrollChanged(float p) {
         mUIDozeTrigger.poke();
         requestSynchronizeStackViewsWithModel();
-        postInvalidateOnAnimation();
+        ViewCompat.postInvalidateOnAnimation(this);
     }
 
     public void notifyDataSetChangedOld() {
@@ -1155,7 +1149,7 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
         }
 
         // Animate all the tasks into place
-        requestSynchronizeStackViewsWithModel(200);
+        requestSynchronizeStackViewsWithModel(100);
 
         T newFrontMostTask = data.get(data.size() - 1);
         // Update the new front most task

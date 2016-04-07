@@ -84,11 +84,7 @@ public class DeckChildViewThumbnail extends View {
     }
 
     public DeckChildViewThumbnail(Context context, AttributeSet attrs, int defStyleAttr) {
-        this(context, attrs, defStyleAttr, 0);
-    }
-
-    public DeckChildViewThumbnail(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
+        super(context, attrs, defStyleAttr);
         mConfig = DeckViewConfig.getInstance();
         mDrawPaint.setColorFilter(mLightingColorFilter);
         mDrawPaint.setFilterBitmap(true);
@@ -97,6 +93,7 @@ public class DeckChildViewThumbnail extends View {
 
     @Override
     protected void onFinishInflate() {
+        super.onFinishInflate();
         mThumbnailAlpha = mConfig.taskViewThumbnailAlpha;
         updateThumbnailPaintFilter();
     }
@@ -116,7 +113,7 @@ public class DeckChildViewThumbnail extends View {
             return;
         }
         // Draw the thumbnail with the rounded corners
-        canvas.drawRoundRect(0, 0, getWidth(), getHeight(),
+        canvas.drawRoundRect(new RectF(0, 0, getWidth(), getHeight()),
                 mConfig.taskViewRoundedCornerRadiusPx,
                 mConfig.taskViewRoundedCornerRadiusPx, mDrawPaint);
     }
@@ -181,7 +178,7 @@ public class DeckChildViewThumbnail extends View {
         int top = (int) Math.max(0, taskBar.getTranslationY() +
                 taskBar.getMeasuredHeight() - 1);
         mClipRect.set(0, top, getMeasuredWidth(), getMeasuredHeight());
-        setClipBounds(mClipRect);
+//        setClipBounds(mClipRect);
     }
 
     /**

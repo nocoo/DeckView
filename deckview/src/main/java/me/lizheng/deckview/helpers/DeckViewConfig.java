@@ -169,13 +169,13 @@ public class DeckViewConfig {
 
         // Interpolators
         fastOutSlowInInterpolator = AnimationUtils.loadInterpolator(context,
-                R.interpolator.fast_out_slow_in);
+                android.R.anim.decelerate_interpolator);
         fastOutLinearInInterpolator = AnimationUtils.loadInterpolator(context,
-                R.interpolator.fast_out_linear_in);
+                android.R.anim.accelerate_interpolator);
         linearOutSlowInInterpolator = AnimationUtils.loadInterpolator(context,
-                R.interpolator.linear_out_slow_in);
+                android.R.anim.decelerate_interpolator);
         quintOutInterpolator = AnimationUtils.loadInterpolator(context,
-                R.interpolator.decelerate_quint);
+                android.R.anim.accelerate_interpolator);
     }
 
     /**

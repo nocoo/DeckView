@@ -67,7 +67,7 @@ public class DeckViewSampleActivity extends Activity {
         mDeckView = (DeckView) findViewById(R.id.deckview);
         mDefaultThumbnail = BitmapFactory.decodeResource(getResources(),
                 R.drawable.default_thumbnail);
-        mDefaultHeaderIcon = getResources().getDrawable(R.drawable.default_header_icon, getTheme());
+        mDefaultHeaderIcon = getResources().getDrawable(R.drawable.default_header_icon);
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(CURRENT_LIST)) {

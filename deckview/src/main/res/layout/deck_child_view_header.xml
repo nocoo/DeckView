@@ -27,7 +27,7 @@
         android:id="@+id/application_icon"
         android:layout_width="@dimen/task_view_application_icon_size"
         android:layout_height="@dimen/task_view_application_icon_size"
-        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
         android:layout_gravity="center_vertical|start"
         android:padding="8dp"
         android:background="@drawable/deck_child_view_button_bg" />
@@ -52,10 +52,10 @@
         android:id="@+id/dismiss_task"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginRight="4dp"
         android:layout_gravity="center_vertical|end"
         android:padding="12dp"
-        android:background="@drawable/deck_child_view_button_bg"
+        android:background="@drawable/w45"
         android:visibility="invisible"
         android:src="@drawable/deck_child_view_dismiss_light" />
 </me.lizheng.deckview.views.DeckChildViewHeader>
