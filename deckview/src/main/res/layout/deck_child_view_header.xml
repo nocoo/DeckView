@@ -27,35 +27,36 @@
         android:id="@+id/application_icon"
         android:layout_width="@dimen/task_view_application_icon_size"
         android:layout_height="@dimen/task_view_application_icon_size"
-        android:layout_marginStart="8dp"
         android:layout_gravity="center_vertical|start"
-        android:padding="8dp"
-        android:background="@drawable/deck_child_view_button_bg" />
+        android:layout_marginStart="8dp"
+        android:background="@drawable/deck_child_view_button_bg"
+        android:padding="8dp" />
 
     <TextView
         android:id="@+id/activity_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|start"
-        android:layout_marginStart="64dp"
         android:layout_marginEnd="64dp"
-        android:textSize="16sp"
-        android:textColor="#ffffffff"
-        android:text="@string/deck_view_empty_message"
-        android:fontFamily="sans-serif-medium"
-        android:singleLine="true"
-        android:maxLines="2"
+        android:layout_marginStart="64dp"
         android:ellipsize="marquee"
-        android:fadingEdge="horizontal" />
+        android:fadingEdge="horizontal"
+        android:fontFamily="sans-serif-medium"
+        android:maxLines="2"
+        android:singleLine="true"
+        android:text="@string/deck_view_empty_message"
+        android:textColor="#ffffffff"
+        android:textSize="16sp" />
 
     <me.lizheng.deckview.views.FixedSizeImageView
         android:id="@+id/dismiss_task"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_marginEnd="4dp"
         android:layout_gravity="center_vertical|end"
-        android:padding="12dp"
+        android:layout_marginEnd="4dp"
         android:background="@drawable/deck_child_view_button_bg"
-        android:visibility="invisible"
-        android:src="@drawable/deck_child_view_dismiss_light" />
+        android:padding="12dp"
+        android:src="@drawable/deck_child_view_dismiss_light"
+        android:visibility="invisible" />
+
 </me.lizheng.deckview.views.DeckChildViewHeader>

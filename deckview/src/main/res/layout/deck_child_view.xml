@@ -17,8 +17,7 @@
      limitations under the License.
 -->
 
-<me.lizheng.deckview.views.DeckChildView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<me.lizheng.deckview.views.DeckChildView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:focusable="true">
@@ -26,13 +25,17 @@
     <FrameLayout
         android:id="@+id/task_view_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#FF00FF00">
 
         <me.lizheng.deckview.views.DeckChildViewThumbnail
             android:id="@+id/task_view_thumbnail"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:background="#FF00FF00" />
 
         <include layout="@layout/deck_child_view_header" />
+
     </FrameLayout>
+
 </me.lizheng.deckview.views.DeckChildView>

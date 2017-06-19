@@ -3,11 +3,11 @@
     tools:context=".DeckViewSampleActivity">
     <item
         android:id="@+id/action_add"
-        android:title="Add"
-        android:showAsAction="never" />
+        android:showAsAction="never"
+        android:title="Add" />
 
     <item
         android:id="@+id/action_add_multiple"
-        android:title="Add multiple"
-        android:showAsAction="never" />
+        android:showAsAction="never"
+        android:title="Add multiple" />
 </menu>

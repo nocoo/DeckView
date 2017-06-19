@@ -20,6 +20,7 @@ package me.lizheng.deckview.views;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
@@ -37,7 +38,7 @@ import android.view.View;
 import me.lizheng.deckview.helpers.DeckViewConfig;
 import me.lizheng.deckview.utilities.DVUtils;
 
-/**
+/*
  * The task thumbnail view.  It implements an image view that allows for animating the dim and
  * alpha of the thumbnail image.
  */
@@ -57,6 +58,13 @@ public class DeckChildViewThumbnail extends View {
     // Thumbnail alpha
     float mThumbnailAlpha;
     ValueAnimator mThumbnailAlphaAnimator;
+    // Task bar clipping, the top of this thumbnail can be clipped against the opaque header
+    // bar that overlaps this thumbnail
+    View mTaskBar;
+    Rect mClipRect = new Rect();
+    // Visibility optimization, if the thumbnail height is less than the height of the header
+    // bar for the task view, then just mark this thumbnail view as invisible
+    boolean mInvisible;
     ValueAnimator.AnimatorUpdateListener mThumbnailAlphaUpdateListener
             = new ValueAnimator.AnimatorUpdateListener() {
         @Override
@@ -65,15 +73,7 @@ public class DeckChildViewThumbnail extends View {
             updateThumbnailPaintFilter();
         }
     };
-
-    // Task bar clipping, the top of this thumbnail can be clipped against the opaque header
-    // bar that overlaps this thumbnail
-    View mTaskBar;
-    Rect mClipRect = new Rect();
-
-    // Visibility optimization, if the thumbnail height is less than the height of the header
-    // bar for the task view, then just mark this thumbnail view as invisible
-    boolean mInvisible;
+    Bitmap mThumbnail;
 
     public DeckChildViewThumbnail(Context context) {
         this(context, null);
@@ -84,11 +84,7 @@ public class DeckChildViewThumbnail extends View {
     }
 
     public DeckChildViewThumbnail(Context context, AttributeSet attrs, int defStyleAttr) {
-        this(context, attrs, defStyleAttr, 0);
-    }
-
-    public DeckChildViewThumbnail(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
+        super(context, attrs, defStyleAttr);
         mConfig = DeckViewConfig.getInstance();
         mDrawPaint.setColorFilter(mLightingColorFilter);
         mDrawPaint.setFilterBitmap(true);
@@ -97,6 +93,7 @@ public class DeckChildViewThumbnail extends View {
 
     @Override
     protected void onFinishInflate() {
+        super.onFinishInflate();
         mThumbnailAlpha = mConfig.taskViewThumbnailAlpha;
         updateThumbnailPaintFilter();
     }
@@ -110,26 +107,27 @@ public class DeckChildViewThumbnail extends View {
         }
     }
 
+    @SuppressLint("DrawAllocation")
     @Override
     protected void onDraw(Canvas canvas) {
         if (mInvisible) {
             return;
         }
+
         // Draw the thumbnail with the rounded corners
-        canvas.drawRoundRect(0, 0, getWidth(), getHeight(),
+        canvas.drawRoundRect(new RectF(0, 0, getWidth(), getHeight()),
                 mConfig.taskViewRoundedCornerRadiusPx,
                 mConfig.taskViewRoundedCornerRadiusPx, mDrawPaint);
     }
 
-    /**
+    /*
      * Sets the thumbnail to a given bitmap.
      */
     void setThumbnail(Bitmap bm) {
         mThumbnail = bm;
 
         if (bm != null) {
-            mBitmapShader = new BitmapShader(bm, Shader.TileMode.CLAMP,
-                    Shader.TileMode.CLAMP);
+            mBitmapShader = new BitmapShader(bm, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
             mDrawPaint.setShader(mBitmapShader);
             mBitmapRect.set(0, 0, bm.getWidth(), bm.getHeight());
             updateThumbnailScale();
@@ -137,10 +135,11 @@ public class DeckChildViewThumbnail extends View {
             mBitmapShader = null;
             mDrawPaint.setShader(null);
         }
+
         updateThumbnailPaintFilter();
     }
 
-    /**
+    /*
      * Updates the paint to draw the thumbnail.
      */
     void updateThumbnailPaintFilter() {
@@ -163,7 +162,7 @@ public class DeckChildViewThumbnail extends View {
         invalidate();
     }
 
-    /**
+    /*
      * Updates the thumbnail shader's scale transform.
      */
     void updateThumbnailScale() {
@@ -173,7 +172,7 @@ public class DeckChildViewThumbnail extends View {
         }
     }
 
-    /**
+    /*
      * Updates the clip rect based on the given task bar.
      */
     void updateClipToTaskBar(View taskBar) {
@@ -181,24 +180,9 @@ public class DeckChildViewThumbnail extends View {
         int top = (int) Math.max(0, taskBar.getTranslationY() +
                 taskBar.getMeasuredHeight() - 1);
         mClipRect.set(0, top, getMeasuredWidth(), getMeasuredHeight());
-        setClipBounds(mClipRect);
     }
 
-    /**
-     * Updates the visibility of the the thumbnail.
-     */
-    void updateThumbnailVisibility(int clipBottom) {
-        boolean invisible = mTaskBar != null && (getHeight() - clipBottom) <= mTaskBar.getHeight();
-        if (invisible != mInvisible) {
-            mInvisible = invisible;
-            if (!mInvisible) {
-                updateThumbnailPaintFilter();
-            }
-            invalidate();
-        }
-    }
-
-    /**
+    /*
      * Sets the dim alpha, only used when we are not using hardware layers.
      * (see RecentsConfiguration.useHardwareLayers)
      */
@@ -207,7 +191,7 @@ public class DeckChildViewThumbnail extends View {
         updateThumbnailPaintFilter();
     }
 
-    /**
+    /*
      * Binds the thumbnail view to the task
      */
     //void rebindToTask(Task t) {
@@ -219,20 +203,14 @@ public class DeckChildViewThumbnail extends View {
         }
     }
 
-    /**
+    /*
      * Unbinds the thumbnail view from the task
      */
     void unbindFromTask() {
         setThumbnail(null);
     }
 
-    Bitmap mThumbnail;
-
-    public Bitmap getThumbnail() {
-        return mThumbnail;
-    }
-
-    /**
+    /*
      * Handles focus changes.
      */
     void onFocusChanged(boolean focused) {
@@ -247,7 +225,7 @@ public class DeckChildViewThumbnail extends View {
         }
     }
 
-    /**
+    /*
      * Prepares for the enter recents animation, this gets called before the the view
      * is first visible and will be followed by a startEnterRecentsAnimation() call.
      */
@@ -260,22 +238,7 @@ public class DeckChildViewThumbnail extends View {
         updateThumbnailPaintFilter();
     }
 
-    /**
-     * Animates this task thumbnail as it enters Recents.
-     */
-    void startEnterRecentsAnimation(int delay, Runnable postAnimRunnable) {
-        startFadeAnimation(mConfig.taskViewThumbnailAlpha, delay,
-                mConfig.taskViewEnterFromAppDuration, postAnimRunnable);
-    }
-
-    /**
-     * Animates this task thumbnail as it exits Recents.
-     */
-    void startLaunchTaskAnimation(Runnable postAnimRunnable) {
-        startFadeAnimation(1f, 0, mConfig.taskViewExitToAppDuration, postAnimRunnable);
-    }
-
-    /**
+    /*
      * Starts a new thumbnail alpha animation.
      */
     void startFadeAnimation(float finalAlpha, int delay, int duration, final Runnable postAnimRunnable) {
@@ -294,5 +257,24 @@ public class DeckChildViewThumbnail extends View {
             });
         }
         mThumbnailAlphaAnimator.start();
+    }
+
+    void updateThumbnailVisibility(int clipBottom) {
+        boolean invisible = mTaskBar != null && (getHeight() - clipBottom) <= mTaskBar.getHeight();
+        if (invisible != mInvisible) {
+            mInvisible = invisible;
+            if (!mInvisible) {
+                updateThumbnailPaintFilter();
+            }
+            invalidate();
+        }
+    }
+
+    public Bitmap getThumbnail() {
+        return mThumbnail;
+    }
+
+    void startLaunchTaskAnimation(Runnable postAnimRunnable) {
+        startFadeAnimation(1f, 0, mConfig.taskViewExitToAppDuration, postAnimRunnable);
     }
 }
