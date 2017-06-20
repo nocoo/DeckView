@@ -63,7 +63,6 @@
     <bool name="config_fake_shadows">false</bool>
 
     <!-- Svelte specific logic, see RecentsConfiguration.SVELTE_* constants. -->
-    212
     <integer name="deck_svelte_level">0</integer>
 
 </resources>

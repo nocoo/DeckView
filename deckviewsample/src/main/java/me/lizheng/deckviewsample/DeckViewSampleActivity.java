@@ -23,6 +23,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -44,6 +45,10 @@ import me.lizheng.deckview.views.DeckView;
 
 public class DeckViewSampleActivity extends Activity {
 
+    // SavedInstance bundle keys
+    private static final String CURRENT_SCROLL = "current.scroll";
+    private static final String CURRENT_LIST = "current.list";
+
     // View that stacks its children like a deck of cards
     DeckView<CardDataModel> mDeckView;
 
@@ -54,10 +59,7 @@ public class DeckViewSampleActivity extends Activity {
     Bitmap mDefaultThumbnail;
 
     // Retain position on configuration change
-    int scrollToChildIndex = -1;
-
-    // SavedInstance bundle keys
-    final String CURRENT_SCROLL = "current.scroll", CURRENT_LIST = "current.list";
+    int mScrollToChildIndex = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,9 +67,8 @@ public class DeckViewSampleActivity extends Activity {
         setContentView(R.layout.activity_deck_view_sample);
 
         mDeckView = (DeckView) findViewById(R.id.deckview);
-        mDefaultThumbnail = BitmapFactory.decodeResource(getResources(),
-                R.drawable.default_thumbnail);
-        mDefaultHeaderIcon = getResources().getDrawable(R.drawable.default_header_icon, getTheme());
+        mDefaultThumbnail = BitmapFactory.decodeResource(getResources(), R.drawable.default_thumbnail);
+        mDefaultHeaderIcon = ContextCompat.getDrawable(getApplicationContext(), R.drawable.default_header_icon);
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(CURRENT_LIST)) {
@@ -75,7 +76,7 @@ public class DeckViewSampleActivity extends Activity {
             }
 
             if (savedInstanceState.containsKey(CURRENT_SCROLL)) {
-                scrollToChildIndex = savedInstanceState.getInt(CURRENT_SCROLL);
+                mScrollToChildIndex = savedInstanceState.getInt(CURRENT_SCROLL);
             }
         }
 
@@ -84,8 +85,8 @@ public class DeckViewSampleActivity extends Activity {
 
             for (int i = 1; i < 100; i++) {
                 CardDataModel cardDataModel = new CardDataModel();
-                cardDataModel.id = generateUniqueKey();
-                cardDataModel.title = "Image ID " + cardDataModel.id;
+                cardDataModel.Id = generateUniqueKey();
+                cardDataModel.Title = "Image ID " + cardDataModel.Id;
                 mEntries.add(cardDataModel);
             }
         }
@@ -100,7 +101,7 @@ public class DeckViewSampleActivity extends Activity {
             @Override
             public void loadViewData(WeakReference<DeckChildView<CardDataModel>> dcv, CardDataModel item) {
                 if (dcv.get() != null) {
-                    dcv.get().onDataLoaded(item, mDefaultThumbnail, mDefaultHeaderIcon, item.title, Color.DKGRAY);
+                    dcv.get().onDataLoaded(item, mDefaultThumbnail, mDefaultHeaderIcon, item.Title, Color.DKGRAY);
                 }
             }
 
@@ -117,7 +118,7 @@ public class DeckViewSampleActivity extends Activity {
             @Override
             public void onItemClick(CardDataModel item) {
                 Toast.makeText(DeckViewSampleActivity.this,
-                        "Item with title: '" + item.title + "' clicked",
+                        "Item with Title: '" + item.Title + "' clicked",
                         Toast.LENGTH_SHORT).show();
             }
 
@@ -131,12 +132,12 @@ public class DeckViewSampleActivity extends Activity {
 
         mDeckView.initialize(deckViewCallback);
 
-        if (scrollToChildIndex != -1) {
+        if (mScrollToChildIndex != -1) {
             mDeckView.post(new Runnable() {
                 @Override
                 public void run() {
                     // Restore scroll position
-                    mDeckView.scrollToChild(scrollToChildIndex);
+                    mDeckView.scrollToChild(mScrollToChildIndex);
                 }
             });
         }
@@ -159,8 +160,8 @@ public class DeckViewSampleActivity extends Activity {
         // Add a new item to the end of the list
         if (id == R.id.action_add) {
             CardDataModel cardDataModel = new CardDataModel();
-            cardDataModel.id = generateUniqueKey();
-            cardDataModel.title = "(New) Image ID " + cardDataModel.id;
+            cardDataModel.Id = generateUniqueKey();
+            cardDataModel.Title = "(New) Image ID " + cardDataModel.Id;
 
             mEntries.add(cardDataModel);
             mDeckView.notifyDataSetChanged();
@@ -178,8 +179,8 @@ public class DeckViewSampleActivity extends Activity {
                         rand.nextInt(mEntries.size()) : 0;
 
                 CardDataModel cardDataModel = new CardDataModel();
-                cardDataModel.id = generateUniqueKey();
-                cardDataModel.title = "(New) Image ID " + cardDataModel.id;
+                cardDataModel.Id = generateUniqueKey();
+                cardDataModel.Title = "(New) Image ID " + cardDataModel.Id;
 
                 mEntries.add(atIndex, cardDataModel);
             }

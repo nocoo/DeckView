@@ -20,14 +20,14 @@ package me.lizheng.deckview.views;
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
-import android.widget.ImageView;
 
 /**
  * This is an optimized ImageView that does not trigger a requestLayout() or invalidate() when
  * setting the image to Null.
  */
-public class FixedSizeImageView extends ImageView {
+public class FixedSizeImageView extends AppCompatImageView {
 
     boolean mAllowRelayout = true;
     boolean mAllowInvalidate = true;
@@ -45,7 +45,7 @@ public class FixedSizeImageView extends ImageView {
     }
 
     public FixedSizeImageView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
+        super(context, attrs, defStyleAttr);
     }
 
     @Override
@@ -70,7 +70,9 @@ public class FixedSizeImageView extends ImageView {
             mAllowRelayout = false;
             mAllowInvalidate = false;
         }
+
         super.setImageDrawable(drawable);
+
         mAllowRelayout = true;
         mAllowInvalidate = true;
     }

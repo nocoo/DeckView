@@ -24,15 +24,15 @@ import me.lizheng.deckview.helpers.DeckChildViewTransform;
 import me.lizheng.deckview.utilities.ReferenceCountedTrigger;
 
 /* Common code related to view animations */
-public class ViewAnimation {
+class ViewAnimation {
 
     /* The animation context for a task view animation into Recents */
-    public static class TaskViewEnterContext {
+    static class TaskViewEnterContext {
         // A trigger to run some logic when all the animations complete.  This works around the fact
         // that it is difficult to coordinate ViewPropertyAnimators
-        public ReferenceCountedTrigger postAnimationTrigger;
+        ReferenceCountedTrigger postAnimationTrigger;
         // An update listener to notify as the enter animation progresses (used for the home transition)
-        public ValueAnimator.AnimatorUpdateListener updateListener;
+        ValueAnimator.AnimatorUpdateListener updateListener;
 
         // These following properties are updated for each task view we start the enter animation on
 
@@ -41,29 +41,28 @@ public class ViewAnimation {
         // The task rect for the current stack
         Rect currentTaskRect;
         // The transform of the current task view
-        public DeckChildViewTransform currentTaskTransform;
+        DeckChildViewTransform currentTaskTransform;
         // The view index of the current task view
-        public int currentStackViewIndex;
+        int currentStackViewIndex;
         // The total number of task views
-        public int currentStackViewCount;
+        int currentStackViewCount;
 
-        public TaskViewEnterContext(ReferenceCountedTrigger t) {
+        TaskViewEnterContext(ReferenceCountedTrigger t) {
             postAnimationTrigger = t;
         }
     }
 
     /* The animation context for a task view animation out of Recents */
-    public static class TaskViewExitContext {
+    static class TaskViewExitContext {
         // A trigger to run some logic when all the animations complete.  This works around the fact
         // that it is difficult to coordinate ViewPropertyAnimators
-        public ReferenceCountedTrigger postAnimationTrigger;
+        ReferenceCountedTrigger postAnimationTrigger;
 
         // The translationY to apply to a TaskView to move it off the bottom of the task stack
-        public int offscreenTranslationY;
+        int offscreenTranslationY;
 
-        public TaskViewExitContext(ReferenceCountedTrigger t) {
+        TaskViewExitContext(ReferenceCountedTrigger t) {
             postAnimationTrigger = t;
         }
     }
-
 }

@@ -27,16 +27,16 @@ import android.os.Parcelable;
  * identifiable. No two items can be such
  * that `item1.equals(item2)` returns `true`.
  * See equals() implementation below.
- * `id` is generated using `DeckViewSampleActivity#generateuniqueKey()`
+ * `Id` is generated using `DeckViewSampleActivity#generateuniqueKey()`
  * Implementing `Parcelable` serves only one purpose - to persist data
  * on configuration change.
  */
 public class CardDataModel implements Parcelable {
 
-    public int id;
-    public String title;
+    int Id;
+    String Title;
 
-    public CardDataModel() {
+    CardDataModel() {
     }
 
     @Override
@@ -44,19 +44,19 @@ public class CardDataModel implements Parcelable {
         return 0;
     }
 
-    public CardDataModel(Parcel in) {
+    CardDataModel(Parcel in) {
         readFromParcel(in);
     }
 
-    public void readFromParcel(Parcel in) {
-        id = in.readInt();
-        title = in.readString();
+    void readFromParcel(Parcel in) {
+        Id = in.readInt();
+        Title = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
-        dest.writeString(title);
+        dest.writeInt(Id);
+        dest.writeString(Title);
     }
 
     public static final Creator<CardDataModel> CREATOR = new Creator<CardDataModel>() {
@@ -71,6 +71,6 @@ public class CardDataModel implements Parcelable {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof CardDataModel && ((CardDataModel) o).id == this.id;
+        return o instanceof CardDataModel && ((CardDataModel) o).Id == this.Id;
     }
 }

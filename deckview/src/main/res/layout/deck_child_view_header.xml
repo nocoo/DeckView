@@ -44,7 +44,6 @@
         android:fontFamily="sans-serif-medium"
         android:maxLines="2"
         android:singleLine="true"
-        android:text="@string/deck_view_empty_message"
         android:textColor="#ffffffff"
         android:textSize="16sp" />
 

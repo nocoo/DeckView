@@ -121,25 +121,6 @@ public class DeckChildViewThumbnail extends View {
     }
 
     /*
-     * Sets the thumbnail to a given bitmap.
-     */
-    void setThumbnail(Bitmap bm) {
-        mThumbnail = bm;
-
-        if (bm != null) {
-            mBitmapShader = new BitmapShader(bm, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-            mDrawPaint.setShader(mBitmapShader);
-            mBitmapRect.set(0, 0, bm.getWidth(), bm.getHeight());
-            updateThumbnailScale();
-        } else {
-            mBitmapShader = null;
-            mDrawPaint.setShader(null);
-        }
-
-        updateThumbnailPaintFilter();
-    }
-
-    /*
      * Updates the paint to draw the thumbnail.
      */
     void updateThumbnailPaintFilter() {
@@ -272,6 +253,25 @@ public class DeckChildViewThumbnail extends View {
 
     public Bitmap getThumbnail() {
         return mThumbnail;
+    }
+
+    /*
+     * Sets the thumbnail to a given bitmap.
+     */
+    void setThumbnail(Bitmap bm) {
+        mThumbnail = bm;
+
+        if (bm != null) {
+            mBitmapShader = new BitmapShader(bm, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+            mDrawPaint.setShader(mBitmapShader);
+            mBitmapRect.set(0, 0, bm.getWidth(), bm.getHeight());
+            updateThumbnailScale();
+        } else {
+            mBitmapShader = null;
+            mDrawPaint.setShader(null);
+        }
+
+        updateThumbnailPaintFilter();
     }
 
     void startLaunchTaskAnimation(Runnable postAnimRunnable) {

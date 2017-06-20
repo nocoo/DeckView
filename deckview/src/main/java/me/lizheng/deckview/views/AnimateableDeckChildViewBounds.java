@@ -17,24 +17,26 @@
 
 package me.lizheng.deckview.views;
 
+import android.annotation.TargetApi;
 import android.graphics.Outline;
 import android.graphics.Rect;
+import android.os.Build;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 
 import me.lizheng.deckview.helpers.DeckViewConfig;
 
 /* An outline provider that has a clip and outline that can be animated. */
+@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class AnimateableDeckChildViewBounds extends ViewOutlineProvider {
 
+    final float mMinAlpha = 0.25f;
     DeckViewConfig mConfig;
-
     DeckChildView mSourceView;
     Rect mClipRect = new Rect();
     Rect mClipBounds = new Rect();
     int mCornerRadius;
     float mAlpha = 1f;
-    final float mMinAlpha = 0.25f;
 
     public AnimateableDeckChildViewBounds(DeckChildView source, int cornerRadius) {
         mConfig = DeckViewConfig.getInstance();
@@ -63,6 +65,13 @@ public class AnimateableDeckChildViewBounds extends ViewOutlineProvider {
     }
 
     /**
+     * Returns the bottom clip.
+     */
+    public int getClipBottom() {
+        return mClipRect.bottom;
+    }
+
+    /**
      * Sets the bottom clip.
      */
     public void setClipBottom(int bottom) {
@@ -75,13 +84,6 @@ public class AnimateableDeckChildViewBounds extends ViewOutlineProvider {
                         bottom - mSourceView.getPaddingBottom());
             }
         }
-    }
-
-    /**
-     * Returns the bottom clip.
-     */
-    public int getClipBottom() {
-        return mClipRect.bottom;
     }
 
     private void updateClipBounds() {

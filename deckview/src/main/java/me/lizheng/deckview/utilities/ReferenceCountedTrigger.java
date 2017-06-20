@@ -19,7 +19,6 @@ package me.lizheng.deckview.utilities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.content.Context;
 
 import java.util.ArrayList;
 
@@ -29,29 +28,27 @@ import java.util.ArrayList;
  */
 public class ReferenceCountedTrigger {
 
-    Context mContext;
-    int mCount;
-    ArrayList<Runnable> mFirstIncRunnables = new ArrayList<Runnable>();
-    ArrayList<Runnable> mLastDecRunnables = new ArrayList<Runnable>();
-    Runnable mErrorRunnable;
+    private int mCount;
+    private  ArrayList<Runnable> mFirstIncRunnables = new ArrayList<Runnable>();
+    private ArrayList<Runnable> mLastDecRunnables = new ArrayList<Runnable>();
+    private Runnable mErrorRunnable;
 
     // Convenience runnables
-    Runnable mIncrementRunnable = new Runnable() {
+    private Runnable mIncrementRunnable = new Runnable() {
         @Override
         public void run() {
             increment();
         }
     };
-    Runnable mDecrementRunnable = new Runnable() {
+    private Runnable mDecrementRunnable = new Runnable() {
         @Override
         public void run() {
             decrement();
         }
     };
 
-    public ReferenceCountedTrigger(Context context, Runnable firstIncRunnable,
+    public ReferenceCountedTrigger(Runnable firstIncRunnable,
                                    Runnable lastDecRunnable, Runnable errorRunanable) {
-        mContext = context;
         if (firstIncRunnable != null) mFirstIncRunnables.add(firstIncRunnable);
         if (lastDecRunnable != null) mLastDecRunnables.add(lastDecRunnable);
         mErrorRunnable = errorRunanable;

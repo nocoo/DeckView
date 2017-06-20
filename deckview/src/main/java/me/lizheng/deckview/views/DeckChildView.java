@@ -28,12 +28,11 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
-import android.view.animation.Interpolator;
-import android.view.animation.PathInterpolator;
 import android.widget.FrameLayout;
 
 import me.lizheng.deckview.R;
@@ -47,25 +46,7 @@ import me.lizheng.deckview.utilities.DVUtils;
 public class DeckChildView<T> extends FrameLayout implements
         View.OnClickListener, View.OnLongClickListener {
 
-    /**
-     * The TaskView callbacks
-     */
-    interface DeckChildViewCallbacks<T> {
-        public void onDeckChildViewAppIconClicked(DeckChildView dcv);
-
-        public void onDeckChildViewAppInfoClicked(DeckChildView dcv);
-
-        public void onDeckChildViewClicked(DeckChildView<T> dcv, T key);
-
-        public void onDeckChildViewDismissed(DeckChildView<T> dcv);
-
-        public void onDeckChildViewClipStateChanged(DeckChildView dcv);
-
-        public void onDeckChildViewFocusChanged(DeckChildView<T> dcv, boolean focused);
-    }
-
     DeckViewConfig mConfig;
-
     float mTaskProgress;
     ObjectAnimator mTaskProgressAnimator;
     float mMaxDimScale;
@@ -73,21 +54,16 @@ public class DeckChildView<T> extends FrameLayout implements
     AccelerateInterpolator mDimInterpolator = new AccelerateInterpolator(1f);
     PorterDuffColorFilter mDimColorFilter = new PorterDuffColorFilter(0, PorterDuff.Mode.SRC_ATOP);
     Paint mDimLayerPaint = new Paint();
-
     T mKey;
     boolean mTaskDataLoaded;
     boolean mIsFocused;
     boolean mFocusAnimationsEnabled;
     boolean mClipViewInStack;
     AnimateableDeckChildViewBounds mViewBounds;
-
     View mContent;
     DeckChildViewThumbnail mThumbnailView;
     DeckChildViewHeader mHeaderView;
     DeckChildViewCallbacks<T> mCb;
-
-    public static final Interpolator ALPHA_IN = new PathInterpolator(0.4f, 0f, 1f, 1f);
-
     // Optimizations
     ValueAnimator.AnimatorUpdateListener mUpdateDimListener =
             new ValueAnimator.AnimatorUpdateListener() {
@@ -97,21 +73,18 @@ public class DeckChildView<T> extends FrameLayout implements
                 }
             };
 
-
     public DeckChildView(Context context) {
         this(context, null);
     }
+
 
     public DeckChildView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
     public DeckChildView(Context context, AttributeSet attrs, int defStyleAttr) {
-        this(context, attrs, defStyleAttr, 0);
-    }
+        super(context, attrs, defStyleAttr);
 
-    public DeckChildView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
         mConfig = DeckViewConfig.getInstance();
         mMaxDimScale = mConfig.taskStackMaxDim / 255f;
         mClipViewInStack = true;
@@ -121,7 +94,9 @@ public class DeckChildView<T> extends FrameLayout implements
         if (mConfig.fakeShadows) {
             setBackground(new FakeShadowDrawable(context.getResources(), mConfig));
         }
-        setOutlineProvider(mViewBounds);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setOutlineProvider(mViewBounds);
+        }
     }
 
     /**
@@ -157,6 +132,8 @@ public class DeckChildView<T> extends FrameLayout implements
 
     @Override
     protected void onFinishInflate() {
+        super.onFinishInflate();
+
         // Bind the views
         mContent = findViewById(R.id.task_view_content);
         mHeaderView = (DeckChildViewHeader) findViewById(R.id.task_view_bar);
@@ -185,7 +162,9 @@ public class DeckChildView<T> extends FrameLayout implements
                 MeasureSpec.makeMeasureSpec(widthWithoutPadding, MeasureSpec.EXACTLY),
                 MeasureSpec.makeMeasureSpec(widthWithoutPadding, MeasureSpec.EXACTLY));
         setMeasuredDimension(width, height);
-        invalidateOutline();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            invalidateOutline();
+        }
     }
 
     /**
@@ -263,7 +242,9 @@ public class DeckChildView<T> extends FrameLayout implements
         } else if (mConfig.launchedFromHome) {
             // Move the task view off screen (below) so we can animate it in
             setTranslationY(offscreenY);
-            setTranslationZ(0);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                setTranslationZ(0);
+            }
             setScaleX(1f);
             setScaleY(1f);
         }
@@ -290,8 +271,10 @@ public class DeckChildView<T> extends FrameLayout implements
 
             setScaleX(transform.scale);
             setScaleY(transform.scale);
-            if (!mConfig.fakeShadows) {
-                animate().translationZ(transform.translationZ);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (!mConfig.fakeShadows) {
+                    animate().translationZ(transform.translationZ);
+                }
             }
             animate()
                     .translationY(transform.translationY)
@@ -458,6 +441,13 @@ public class DeckChildView<T> extends FrameLayout implements
     }
 
     /**
+     * Returns the current task progress.
+     */
+    public float getTaskProgress() {
+        return mTaskProgress;
+    }
+
+    /**
      * Sets the current task progress.
      */
     public void setTaskProgress(float p) {
@@ -467,10 +457,10 @@ public class DeckChildView<T> extends FrameLayout implements
     }
 
     /**
-     * Returns the current task progress.
+     * Returns the current dim.
      */
-    public float getTaskProgress() {
-        return mTaskProgress;
+    public int getDim() {
+        return mDimAlpha;
     }
 
     /**
@@ -496,13 +486,6 @@ public class DeckChildView<T> extends FrameLayout implements
                 mHeaderView.setDimAlpha(dim);
             }
         }
-    }
-
-    /**
-     * Returns the current dim.
-     */
-    public int getDim() {
-        return mDimAlpha;
     }
 
     /**
@@ -537,7 +520,44 @@ public class DeckChildView<T> extends FrameLayout implements
         setDim(getDimFromTaskProgress());
     }
 
+    /**
+     * Unsets the focused task explicitly.
+     */
+    void unsetFocusedTask() {
+        mIsFocused = false;
+        if (mFocusAnimationsEnabled) {
+            // Un-focus the header bar
+            mHeaderView.onTaskViewFocusChanged(false, true);
+        }
+
+        // Update the thumbnail alpha with the focus
+        mThumbnailView.onFocusChanged(false);
+        // Call the callback
+        if (mCb != null) {
+            mCb.onDeckChildViewFocusChanged(this, false);
+        }
+        invalidate();
+    }
+
     /**** View focus state ****/
+
+    /**
+     * Updates the explicitly focused state when the view focus changes.
+     */
+    @Override
+    protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect) {
+        super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
+        if (!gainFocus) {
+            unsetFocusedTask();
+        }
+    }
+
+    /**
+     * Returns whether we have explicitly been focused.
+     */
+    public boolean isFocusedTask() {
+        return mIsFocused || isFocused();
+    }
 
     /**
      * Sets the focused task explicitly. We need a separate flag because requestFocus() won't happen
@@ -566,43 +586,6 @@ public class DeckChildView<T> extends FrameLayout implements
     }
 
     /**
-     * Unsets the focused task explicitly.
-     */
-    void unsetFocusedTask() {
-        mIsFocused = false;
-        if (mFocusAnimationsEnabled) {
-            // Un-focus the header bar
-            mHeaderView.onTaskViewFocusChanged(false, true);
-        }
-
-        // Update the thumbnail alpha with the focus
-        mThumbnailView.onFocusChanged(false);
-        // Call the callback
-        if (mCb != null) {
-            mCb.onDeckChildViewFocusChanged(this, false);
-        }
-        invalidate();
-    }
-
-    /**
-     * Updates the explicitly focused state when the view focus changes.
-     */
-    @Override
-    protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect) {
-        super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
-        if (!gainFocus) {
-            unsetFocusedTask();
-        }
-    }
-
-    /**
-     * Returns whether we have explicitly been focused.
-     */
-    public boolean isFocusedTask() {
-        return mIsFocused || isFocused();
-    }
-
-    /**
      * Enables all focus animations.
      */
     void enableFocusAnimations() {
@@ -614,14 +597,14 @@ public class DeckChildView<T> extends FrameLayout implements
         }
     }
 
-    /**** TaskCallbacks Implementation ****/
-
     /**
      * Binds this task view to the task
      */
     public void onTaskBound(T key) {
         mKey = key;
     }
+
+    /**** TaskCallbacks Implementation ****/
 
     private boolean isBound() {
         return mKey != null;
@@ -726,5 +709,22 @@ public class DeckChildView<T> extends FrameLayout implements
             }
         }
         return false;
+    }
+
+    /**
+     * The TaskView callbacks
+     */
+    interface DeckChildViewCallbacks<T> {
+        public void onDeckChildViewAppIconClicked(DeckChildView dcv);
+
+        public void onDeckChildViewAppInfoClicked(DeckChildView dcv);
+
+        public void onDeckChildViewClicked(DeckChildView<T> dcv, T key);
+
+        public void onDeckChildViewDismissed(DeckChildView<T> dcv);
+
+        public void onDeckChildViewClipStateChanged(DeckChildView dcv);
+
+        public void onDeckChildViewFocusChanged(DeckChildView<T> dcv, boolean focused);
     }
 }

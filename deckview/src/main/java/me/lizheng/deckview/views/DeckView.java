@@ -21,6 +21,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -29,6 +30,11 @@ import android.view.WindowInsets;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.FrameLayout;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+
 import me.lizheng.deckview.R;
 import me.lizheng.deckview.helpers.DeckChildViewTransform;
 import me.lizheng.deckview.helpers.DeckViewConfig;
@@ -36,11 +42,6 @@ import me.lizheng.deckview.utilities.DVConstants;
 import me.lizheng.deckview.utilities.DVUtils;
 import me.lizheng.deckview.utilities.DozeTrigger;
 import me.lizheng.deckview.utilities.ReferenceCountedTrigger;
-
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 
 /* The visual representation of a task stack view */
 public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCallbacks,*/
@@ -83,6 +84,7 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
                     requestUpdateStackViewsClip();
                 }
             };
+    Callback<T> mCallback;
 
     public DeckView(Context context) {
         this(context, null);
@@ -97,7 +99,7 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
     }
 
     public DeckView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
+        super(context, attrs, defStyleAttr);
         DeckViewConfig.reinitialize(getContext());
         mConfig = DeckViewConfig.getInstance();
     }
@@ -106,7 +108,7 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
         mCallback = callback;
         requestLayout();
 
-        mViewPool = new ViewPool<DeckChildView<T>, T>(getContext(), this);
+        mViewPool = new ViewPool<>(getContext(), this);
         mInflater = LayoutInflater.from(getContext());
         mLayoutAlgorithm = new DeckViewLayoutAlgorithm<T>(mConfig);
         mStackScroller = new DeckViewScroller(getContext(), mConfig, mLayoutAlgorithm);
@@ -434,7 +436,6 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
                 postScrollRunnable = new Runnable() {
                     @Override
                     public void run() {
-
                         DeckChildView tv = getChildViewForTask(mCallback.getData().get(mFocusedTaskIndex));
                         if (tv != null) {
                             tv.setFocusedTask(animateFocusedState);
@@ -744,7 +745,7 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
 
     void showDeck(Context context) {
         // Try and start the enter animation (or restart it on configuration changed)
-        ReferenceCountedTrigger t = new ReferenceCountedTrigger(context, null, null, null);
+        ReferenceCountedTrigger t = new ReferenceCountedTrigger(null, null, null);
         ViewAnimation.TaskViewEnterContext ctx = new ViewAnimation.TaskViewEnterContext(t);
 
         // We have to increment/decrement the post animation trigger in case there are no children
@@ -798,19 +799,23 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
 
     @Override
     public WindowInsets onApplyWindowInsets(WindowInsets insets) {
-        // Update the configuration with the latest system insets and trigger a relayout
-        // mConfig.updateSystemInsets(insets.getSystemWindowInsets());
-        mConfig.updateSystemInsets(new Rect(insets.getSystemWindowInsetLeft(),
-                insets.getSystemWindowInsetTop(),
-                insets.getSystemWindowInsetRight(),
-                insets.getSystemWindowInsetBottom()));
-        requestLayout();
-        return insets.consumeSystemWindowInsets();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            // Update the configuration with the latest system insets and trigger a relayout
+            // mConfig.updateSystemInsets(insets.getSystemWindowInsets());
+            mConfig.updateSystemInsets(new Rect(insets.getSystemWindowInsetLeft(),
+                    insets.getSystemWindowInsetTop(),
+                    insets.getSystemWindowInsetRight(),
+                    insets.getSystemWindowInsetBottom()));
+            requestLayout();
+
+            return insets.consumeSystemWindowInsets();
+        }
+
+        return insets;
     }
 
     void hideDeck(Context context, Runnable finishRunnable) {
-        ReferenceCountedTrigger exitTrigger = new ReferenceCountedTrigger(context,
-                null, finishRunnable, null);
+        ReferenceCountedTrigger exitTrigger = new ReferenceCountedTrigger(null, finishRunnable, null);
         ViewAnimation.TaskViewExitContext exitCtx =
                 new ViewAnimation.TaskViewExitContext(exitTrigger);
 
@@ -1170,8 +1175,6 @@ public class DeckView<T> extends FrameLayout implements /*TaskStack.TaskStackCal
         if (mCallback.getData().size() == 0)
             mCallback.onNoViewsToDeck();
     }
-
-    Callback<T> mCallback;
 
     public interface Callback<T> {
         public ArrayList<T> getData();

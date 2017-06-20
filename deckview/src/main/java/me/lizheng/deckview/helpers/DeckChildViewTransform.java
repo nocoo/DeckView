@@ -19,12 +19,14 @@ package me.lizheng.deckview.helpers;
 
 import android.animation.ValueAnimator;
 import android.graphics.Rect;
+import android.os.Build;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
 import android.view.animation.Interpolator;
 
 /* The transform state for a task view */
 public class DeckChildViewTransform {
+
     public int startDelay = 0;
     public int translationY = 0;
     public float translationZ = 0;
@@ -47,6 +49,20 @@ public class DeckChildViewTransform {
         visible = o.visible;
         rect.set(o.rect);
         p = o.p;
+    }
+
+    /**
+     * Reset the transform on a view.
+     */
+    public static void reset(View v) {
+        v.setTranslationX(0f);
+        v.setTranslationY(0f);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            v.setTranslationZ(0f);
+        }
+        v.setScaleX(1f);
+        v.setScaleY(1f);
+        v.setAlpha(1f);
     }
 
     /**
@@ -96,8 +112,10 @@ public class DeckChildViewTransform {
             if (hasTranslationYChangedFrom(v.getTranslationY())) {
                 anim.translationY(translationY);
             }
-            if (allowShadows && hasTranslationZChangedFrom(v.getTranslationZ())) {
-                anim.translationZ(translationZ);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (allowShadows && hasTranslationZChangedFrom(v.getTranslationZ())) {
+                    anim.translationZ(translationZ);
+                }
             }
             if (hasScaleChangedFrom(v.getScaleX())) {
                 anim.scaleX(scale)
@@ -126,8 +144,10 @@ public class DeckChildViewTransform {
             if (hasTranslationYChangedFrom(v.getTranslationY())) {
                 v.setTranslationY(translationY);
             }
-            if (allowShadows && hasTranslationZChangedFrom(v.getTranslationZ())) {
-                v.setTranslationZ(translationZ);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (allowShadows && hasTranslationZChangedFrom(v.getTranslationZ())) {
+                    v.setTranslationZ(translationZ);
+                }
             }
             if (hasScaleChangedFrom(v.getScaleX())) {
                 v.setScaleX(scale);
@@ -137,18 +157,6 @@ public class DeckChildViewTransform {
                 v.setAlpha(alpha);
             }
         }
-    }
-
-    /**
-     * Reset the transform on a view.
-     */
-    public static void reset(View v) {
-        v.setTranslationX(0f);
-        v.setTranslationY(0f);
-        v.setTranslationZ(0f);
-        v.setScaleX(1f);
-        v.setScaleY(1f);
-        v.setAlpha(1f);
     }
 
     @Override

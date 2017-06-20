@@ -37,6 +37,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RippleDrawable;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -53,13 +55,13 @@ import me.lizheng.deckview.utilities.DVUtils;
 /* The task bar view */
 public class DeckChildViewHeader extends FrameLayout {
 
+    // Static highlight that we draw at the top of each view
+    static Paint sHighlightPaint;
     DeckViewConfig mConfig;
-
     // Header views
     ImageView mDismissButton;
     ImageView mApplicationIcon;
     TextView mActivityDescription;
-
     // Header drawables
     boolean mCurrentPrimaryColorIsDark;
     int mCurrentPrimaryColor;
@@ -70,10 +72,6 @@ public class DeckChildViewHeader extends FrameLayout {
     GradientDrawable mBackgroundColorDrawable;
     AnimatorSet mFocusAnimator;
     String mDismissContentDescription;
-
-    // Static highlight that we draw at the top of each view
-    static Paint sHighlightPaint;
-
     // Header dim, which is only used when task view hardware layers are not used
     Paint mDimLayerPaint = new Paint();
     PorterDuffColorFilter mDimColorFilter = new PorterDuffColorFilter(0, PorterDuff.Mode.SRC_ATOP);
@@ -87,27 +85,26 @@ public class DeckChildViewHeader extends FrameLayout {
     }
 
     public DeckChildViewHeader(Context context, AttributeSet attrs, int defStyleAttr) {
-        this(context, attrs, defStyleAttr, 0);
-    }
-
-    public DeckChildViewHeader(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
+        super(context, attrs, defStyleAttr);
         mConfig = DeckViewConfig.getInstance();
         setWillNotDraw(false);
-        setClipToOutline(true);
-        setOutlineProvider(new ViewOutlineProvider() {
-            @Override
-            public void getOutline(View view, Outline outline) {
-                outline.setRect(0, 0, getMeasuredWidth(), getMeasuredHeight());
-            }
-        });
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setClipToOutline(true);
+            setOutlineProvider(new ViewOutlineProvider() {
+                @Override
+                public void getOutline(View view, Outline outline) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        outline.setRect(0, 0, getMeasuredWidth(), getMeasuredHeight());
+                    }
+                }
+            });
+        }
 
         // Load the dismiss resources
         Resources res = context.getResources();
         mLightDismissDrawable = res.getDrawable(R.drawable.deck_child_view_dismiss_light);
         mDarkDismissDrawable = res.getDrawable(R.drawable.deck_child_view_dismiss_dark);
-        mDismissContentDescription =
-                res.getString(R.string.accessibility_item_will_be_dismissed);
+        mDismissContentDescription = "";
 
         // Configure the highlight paint
         if (sHighlightPaint == null) {
@@ -130,6 +127,8 @@ public class DeckChildViewHeader extends FrameLayout {
 
     @Override
     protected void onFinishInflate() {
+        super.onFinishInflate();
+
         // Initialize the icon and description views
         mApplicationIcon = (ImageView) findViewById(R.id.application_icon);
         mActivityDescription = (TextView) findViewById(R.id.activity_description);
@@ -142,15 +141,15 @@ public class DeckChildViewHeader extends FrameLayout {
             }
         }
 
-        mBackgroundColorDrawable = (GradientDrawable) getContext().getDrawable(R.drawable
+        mBackgroundColorDrawable = (GradientDrawable) ContextCompat.getDrawable(getContext(), R.drawable
                 .deck_child_view_header_bg_color);
         // Copy the ripple drawable since we are going to be manipulating it
-        mBackground = (RippleDrawable)
-                getContext().getDrawable(R.drawable.deck_child_view_header_bg);
+        mBackground = (RippleDrawable) ContextCompat.getDrawable(getContext(), R.drawable.deck_child_view_header_bg);
         mBackground = (RippleDrawable) mBackground.mutate().getConstantState().newDrawable();
-        mBackground.setColor(ColorStateList.valueOf(0));
         mBackground.setDrawableByLayerId(mBackground.getId(0), mBackgroundColorDrawable);
-        setBackground(mBackground);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setBackground(mBackground);
+        }
     }
 
     @Override
@@ -160,8 +159,10 @@ public class DeckChildViewHeader extends FrameLayout {
         float radius = mConfig.taskViewRoundedCornerRadiusPx;
         int count = canvas.save(Canvas.CLIP_SAVE_FLAG);
         canvas.clipRect(0, 0, getMeasuredWidth(), getMeasuredHeight());
-        canvas.drawRoundRect(-offset, 0f, (float) getMeasuredWidth() + offset,
-                getMeasuredHeight() + radius, radius, radius, sHighlightPaint);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            canvas.drawRoundRect(-offset, 0f, (float) getMeasuredWidth() + offset,
+                    getMeasuredHeight() + radius, radius, radius, sHighlightPaint);
+        }
         canvas.restoreToCount(count);
     }
 
@@ -309,7 +310,9 @@ public class DeckChildViewHeader extends FrameLayout {
                     secondaryColor,
                     secondaryColor
             };
-            mBackground.setColor(new ColorStateList(states, colors));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                mBackground.setColor(new ColorStateList(states, colors));
+            }
             mBackground.setState(newStates);
             // Pulse the background color
             int currentColor = mBackgroundColor;
@@ -365,7 +368,9 @@ public class DeckChildViewHeader extends FrameLayout {
                 mFocusAnimator.start();
             } else {
                 mBackground.setState(new int[]{});
-                setTranslationZ(0f);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    setTranslationZ(0f);
+                }
             }
         }
     }

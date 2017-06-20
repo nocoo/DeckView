@@ -34,8 +34,6 @@ import me.lizheng.deckview.utilities.DVConstants;
  * Configuration helper
  */
 public class DeckViewConfig {
-    static DeckViewConfig sInstance;
-    static int sPrevConfigurationHashCode;
 
     /**
      * Levels of svelte in increasing severity/austerity.
@@ -50,7 +48,8 @@ public class DeckViewConfig {
     public static final int SVELTE_DISABLE_CACHE = 2;
     // Disable all thumbnail loading.
     public static final int SVELTE_DISABLE_LOADING = 3;
-
+    private static DeckViewConfig sInstance;
+    private static int sPrevConfigurationHashCode;
     /**
      * Animations
      */
@@ -75,12 +74,6 @@ public class DeckViewConfig {
      */
     public Rect systemInsets = new Rect();
     public Rect displayRect = new Rect();
-
-    /**
-     * Layout
-     */
-    boolean isLandscape;
-
     /**
      * Task stack
      */
@@ -89,13 +82,11 @@ public class DeckViewConfig {
     public int taskStackTopPaddingPx;
     public float taskStackWidthPaddingPct;
     public float taskStackOverscrollPct;
-
     /**
      * Transitions
      */
     public int transitionEnterFromAppDelay;
     public int transitionEnterFromHomeDelay;
-
     /**
      * Task view animation and styles
      */
@@ -112,7 +103,6 @@ public class DeckViewConfig {
     public int taskViewHighlightPx;
     public int taskViewAffiliateGroupEnterOffsetPx;
     public float taskViewThumbnailAlpha;
-
     /**
      * Task bar colors
      */
@@ -121,18 +111,15 @@ public class DeckViewConfig {
     public int taskBarViewDarkTextColor;
     public int taskBarViewHighlightColor;
     public float taskBarViewAffiliationColorMinAlpha;
-
     /**
      * Task bar size & animations
      */
     public int taskBarHeight;
     public int taskBarDismissDozeDelaySeconds;
-
     /**
      * Nav bar scrim
      */
     public int navBarScrimEnterDuration;
-
     /**
      * Launch states
      */
@@ -146,19 +133,21 @@ public class DeckViewConfig {
     public int launchedToTaskId;
     public int launchedNumVisibleTasks;
     public int launchedNumVisibleThumbnails;
-
     /**
      * Misc *
      */
     public boolean useHardwareLayers;
     public int altTabKeyDelay;
     public boolean fakeShadows;
-
     /**
      * Dev options and global settings
      */
     public boolean debugModeEnabled;
     public int svelteLevel;
+    /**
+     * Layout
+     */
+    boolean isLandscape;
 
     /**
      * Private constructor

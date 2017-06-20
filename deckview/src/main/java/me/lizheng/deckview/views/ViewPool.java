@@ -23,27 +23,16 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 /* A view pool to manage more views than we can visibly handle */
-public class ViewPool<V, T> {
+class ViewPool<V, T> {
 
-    /* An interface to the consumer of a view pool */
-    public interface ViewPoolConsumer<V, T> {
-        public V createView(Context context);
-
-        public void prepareViewToEnterPool(V v);
-
-        public void prepareViewToLeavePool(V v, T prepareData, boolean isNewView);
-
-        public boolean hasPreferredData(V v, T preferredData);
-    }
-
-    Context mContext;
-    ViewPoolConsumer<V, T> mViewCreator;
-    LinkedList<V> mPool = new LinkedList<V>();
+    private Context mContext;
+    private ViewPoolConsumer<V, T> mViewCreator;
+    private LinkedList<V> mPool = new LinkedList<>();
 
     /**
      * Initializes the pool with a fixed predetermined pool size
      */
-    public ViewPool(Context context, ViewPoolConsumer<V, T> viewCreator) {
+    ViewPool(Context context, ViewPoolConsumer<V, T> viewCreator) {
         mContext = context;
         mViewCreator = viewCreator;
     }
@@ -93,5 +82,16 @@ public class ViewPool<V, T> {
             return mPool.iterator();
         }
         return null;
+    }
+
+    /* An interface to the consumer of a view pool */
+    public interface ViewPoolConsumer<V, T> {
+        V createView(Context context);
+
+        void prepareViewToEnterPool(V v);
+
+        void prepareViewToLeavePool(V v, T prepareData, boolean isNewView);
+
+        boolean hasPreferredData(V v, T preferredData);
     }
 }

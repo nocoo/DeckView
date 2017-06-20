@@ -31,35 +31,34 @@ import me.lizheng.deckview.utilities.DVConstants;
 
 /* Handles touch events for a TaskStackView. */
 public class DeckViewTouchHandler implements DeckViewSwipeHelper.Callback {
-    static int INACTIVE_POINTER_ID = -1;
 
-    DeckViewConfig mConfig;
-    DeckView mDeckView;
-    DeckViewScroller mScroller;
-    VelocityTracker mVelocityTracker;
-
-    boolean mIsScrolling;
-
-    float mInitialP;
-    float mLastP;
-    float mTotalPMotion;
-    int mInitialMotionX, mInitialMotionY;
-    int mLastMotionX, mLastMotionY;
-    int mActivePointerId = INACTIVE_POINTER_ID;
+    private static int INACTIVE_POINTER_ID = -1;
     DeckChildView mActiveDeckChildView = null;
+    private DeckViewConfig mConfig;
+    private DeckView mDeckView;
+    private DeckViewScroller mScroller;
+    private VelocityTracker mVelocityTracker;
+    private boolean mIsScrolling;
+    private float mInitialP;
+    private float mLastP;
+    private float mTotalPMotion;
+    private int mInitialMotionX, mInitialMotionY;
+    private int mLastMotionX, mLastMotionY;
+    private int mActivePointerId = INACTIVE_POINTER_ID;
+    private int mMinimumVelocity;
+    private int mMaximumVelocity;
 
-    int mMinimumVelocity;
-    int mMaximumVelocity;
     // The scroll touch slop is used to calculate when we start scrolling
-    int mScrollTouchSlop;
+    private int mScrollTouchSlop;
+
     // The page touch slop is used to calculate when we start swiping
-    float mPagingTouchSlop;
+    private float mPagingTouchSlop;
 
-    DeckViewSwipeHelper mSwipeHelper;
-    boolean mInterceptedBySwipeHelper;
+    private DeckViewSwipeHelper mSwipeHelper;
+    private boolean mInterceptedBySwipeHelper;
 
-    public DeckViewTouchHandler(Context context, DeckView dv,
-                                DeckViewConfig config, DeckViewScroller scroller) {
+    DeckViewTouchHandler(Context context, DeckView dv,
+                         DeckViewConfig config, DeckViewScroller scroller) {
         ViewConfiguration configuration = ViewConfiguration.get(context);
         mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
         mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
@@ -78,7 +77,7 @@ public class DeckViewTouchHandler implements DeckViewSwipeHelper.Callback {
     /**
      * Velocity tracker helpers
      */
-    void initOrResetVelocityTracker() {
+    private void initOrResetVelocityTracker() {
         if (mVelocityTracker == null) {
             mVelocityTracker = VelocityTracker.obtain();
         } else {
@@ -86,13 +85,13 @@ public class DeckViewTouchHandler implements DeckViewSwipeHelper.Callback {
         }
     }
 
-    void initVelocityTrackerIfNotExists() {
+    private void initVelocityTrackerIfNotExists() {
         if (mVelocityTracker == null) {
             mVelocityTracker = VelocityTracker.obtain();
         }
     }
 
-    void recycleVelocityTracker() {
+    private void recycleVelocityTracker() {
         if (mVelocityTracker != null) {
             mVelocityTracker.recycle();
             mVelocityTracker = null;
@@ -102,7 +101,7 @@ public class DeckViewTouchHandler implements DeckViewSwipeHelper.Callback {
     /**
      * Returns the view at the specified coordinates
      */
-    DeckChildView findViewAtPoint(int x, int y) {
+    private DeckChildView findViewAtPoint(int x, int y) {
         int childCount = mDeckView.getChildCount();
         for (int i = childCount - 1; i >= 0; i--) {
             DeckChildView tv = (DeckChildView) mDeckView.getChildAt(i);
@@ -118,7 +117,7 @@ public class DeckViewTouchHandler implements DeckViewSwipeHelper.Callback {
     /**
      * Constructs a simulated motion event for the current stack scroll.
      */
-    MotionEvent createMotionEventForStackScroll(MotionEvent ev) {
+    private MotionEvent createMotionEventForStackScroll(MotionEvent ev) {
         MotionEvent pev = MotionEvent.obtainNoHistory(ev);
         pev.setLocation(0, mScroller.progressToScrollRange(mScroller.getStackScroll()));
         return pev;
@@ -127,7 +126,7 @@ public class DeckViewTouchHandler implements DeckViewSwipeHelper.Callback {
     /**
      * Touch preprocessing for handling below
      */
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
+    boolean onInterceptTouchEvent(MotionEvent ev) {
         // Return early if we have no children
         boolean hasChildren = (mDeckView.getChildCount() > 0);
         if (!hasChildren) {
@@ -204,7 +203,7 @@ public class DeckViewTouchHandler implements DeckViewSwipeHelper.Callback {
     /**
      * Handles touch events once we have intercepted them
      */
-    public boolean onTouchEvent(MotionEvent ev) {
+    boolean onTouchEvent(MotionEvent ev) {
         // Short circuit if we have no children
         boolean hasChildren = (mDeckView.getChildCount() > 0);
         if (!hasChildren) {
@@ -349,7 +348,7 @@ public class DeckViewTouchHandler implements DeckViewSwipeHelper.Callback {
     /**
      * Handles generic motion events
      */
-    public boolean onGenericMotionEvent(MotionEvent ev) {
+    boolean onGenericMotionEvent(MotionEvent ev) {
         if ((ev.getSource() & InputDevice.SOURCE_CLASS_POINTER) ==
                 InputDevice.SOURCE_CLASS_POINTER) {
             int action = ev.getAction();
